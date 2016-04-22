@@ -30,6 +30,7 @@ namespace RealEstateGame.Controllers
             ApplicationUser u = await _userManager.FindByIdAsync(User.GetUserId());
             return u;
         }
+
         [NonAction]
         private Player GetPlayer()
         {
@@ -41,26 +42,29 @@ namespace RealEstateGame.Controllers
                 player = _context.Players.First(m => m.UserId == userId);
             } else { 
                 var user = GetUser().Result;
-                player = new Player()
-                {
-                    Username = user.UserName,
-                    UserId = User.GetUserId(),
-                    Money = 1000.00,
-                    // TODO: Make the income calculated instead of set
-                    Income = 1300,
-                    Job = "Full-Time",
-                    LivingIn = "Apartment",
-                    Address = "123 Example St",
-                    // TODO: Make the rent calculated instead of set
-                    Rent = 800.00,
-                    TurnNum = 0,
-                    Actions = 2,
-                };
+                player = Player.GeneratePlayer(user);
                 _context.Players.Add(player);
                 _context.SaveChanges();
                 player = GetPlayer();
             }
             return player;
+        }
+
+        [NonAction]
+        private IEnumerable<Home> GetHomes(int playerId)
+        {
+            if (_context.Homes.Any())
+            {
+                
+                IEnumerable<Home> homes = _context.Homes.Where(m => m.PlayerId == playerId);
+                if (homes.Count() > 0)
+                {
+                    return homes;
+                }
+            }
+            _context.Homes.AddRange(Home.GenerateHomes(playerId));
+            _context.SaveChanges();
+            return GetHomes(playerId);
         }
 
         [NonAction]
@@ -78,6 +82,15 @@ namespace RealEstateGame.Controllers
                 return View("MainPage", GetPlayer());
             else 
             return View();
+        }
+
+        public IActionResult ViewMarket()
+        {
+            if (!User.IsSignedIn()) return RedirectToAction("Index");
+            var player = GetPlayer();
+            var homes = GetHomes(player.PlayerId);
+            ViewBag.Homes = homes;
+            return View(player);
         }
         
         public IActionResult About()
@@ -106,6 +119,9 @@ namespace RealEstateGame.Controllers
             {
                 case "overtime":
                     user.WorkOvertime(_rand);
+                    break;
+                case "viewMarket":
+                    return RedirectToAction("ViewMarket");
                     break;
                 default:
                     break;

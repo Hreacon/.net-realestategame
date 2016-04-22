@@ -1,9 +1,10 @@
 ﻿@model RealEstateGame.Models.Player
 
-<div class="col-md-6">
-    @Html.DisplayFor(m => m, "view-player")
+<div class="containter">
+    <div class="col-md-6">
+        @Html.DisplayFor(m => m, "view-player")
+    </div>
+    <div class="col-md-6">
+        @Html.Partial("MainControls")
+    </div>
 </div>
-<div class="col-md-6">
-    @Html.Partial("MainControls")
-</div>
-    

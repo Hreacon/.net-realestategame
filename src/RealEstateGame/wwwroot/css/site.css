@@ -32,3 +32,23 @@ textarea {
         z-index: 10 !important;
     }
 }
+
+.list-home {
+    border: 1px solid gray;
+    border-radius: 10px;
+    margin: 10px 2%;
+    padding: 5px 0;
+}
+
+.list-home p {
+    text-align: center;
+    font-weight: bold;
+}
+
+.list-home ul {
+    list-style: none;
+    padding-left: 0;
+}
+
+.list-home ul li {
+}

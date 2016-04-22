@@ -84,6 +84,23 @@ namespace RealEstateGame.Models
                 TurnNum++;
             }
         }
+        public static Player GeneratePlayer(ApplicationUser user)
+        {
+            return new Player()
+            {
+                Username = user.UserName,
+                UserId = user.Id,
+                Money = 1000.00,
+                // TODO: Make the income calculated instead of set
+                Income = 1300,
+                Job = "Full-Time",
+                LivingIn = "Apartment",
+                Address = "123 Example St",
+                // TODO: Make the rent calculated instead of set
+                Rent = 800.00,
+                TurnNum = 0,
+                Actions = 2,
+            };
+        }
     }
-
 }

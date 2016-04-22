@@ -1,0 +1,13 @@
+﻿@model RealEstateGame.Models.Home
+
+<div class="list-home col-sm-5">
+    <p>@Model.Address</p>
+    <hr/>
+    <div class="col-sm-6">
+        <ul>
+            <li>Value:  @string.Format("{0:C}", Model.Value)</li>
+            <li>Asking: @string.Format("{0:C}", Model.Asking)</li>
+            <li>Condition: @Model.Condition</li>
+        </ul>
+    </div>
+</div>
