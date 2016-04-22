@@ -93,7 +93,8 @@ namespace RealEstateGame.Models
                 if (TurnNum%6 == 0)
                 {
                     // every six months, a new home appears!
-                    // TODO Add Home
+                    context.Homes.Add(Home.GenerateHome(PlayerId, new Random()));
+                    context.SaveChanges();
                 }
                 if (TurnNum%12 == 0)
                 {
@@ -119,9 +120,17 @@ namespace RealEstateGame.Models
             // TODO Add neighborhood 2% as well, but for now just the city/country and home
             foreach (var home in homes)
             {
-                var local = (rand.NextDouble() - .3 )/ 10 ;
+                var local = (rand.NextDouble() - .3)/10;
 
-                home.Value = (int)Math.Floor(home.Value*(1 + (city + country + local)));
+                home.Value = (int) Math.Floor(home.Value*(1 + (city + country + local)));
+                if (home.Asking > home.Value)
+                {
+                    home.Asking = home.Asking - (home.Asking - home.Value/2);
+                }
+                else
+                {
+                    home.Asking = home.Value;
+                }
                 context.Homes.Update(home);
             }
             context.SaveChanges();
