@@ -42,8 +42,8 @@ namespace RealEstateGame.Models
         {
             int homeNum = rand.Next(1000, 40000);
             string Street = "MX-5 Drive";
-
-            if (homeNum > 30000 && homeNum < 35000) Street = "Miata Plaza";
+            if (homeNum > 35000) Street = Street;
+            else if (homeNum > 30000) Street = "Miata Plaza";
             else if (homeNum > 25000) Street = "GT40 Way";
             else if (homeNum > 20000) Street = "Mazda Point";
             else if (homeNum > 15000) Street = "Audi Road";

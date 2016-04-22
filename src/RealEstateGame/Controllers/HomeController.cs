@@ -56,7 +56,7 @@ namespace RealEstateGame.Controllers
             if (_context.Homes.Any())
             {
                 
-                IEnumerable<Home> homes = _context.Homes.Where(m => m.PlayerId == playerId);
+                IEnumerable<Home> homes = _context.Homes.Where(m => m.PlayerId == playerId && m.Owned == 0 && m.ForSale == 1).OrderBy(m=>m.Asking);
                 if (homes.Count() > 0)
                 {
                     return homes;
