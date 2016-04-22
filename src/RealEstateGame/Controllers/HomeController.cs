@@ -14,10 +14,11 @@ namespace RealEstateGame.Controllers
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private ApplicationDbContext _context;
+        private Random _rand;
 
         public HomeController(ApplicationDbContext context, UserManager<ApplicationUser> userManager )
         {
-            
+            _rand = new Random();
             _context = context;
             _userManager = userManager;
         }
@@ -34,6 +35,15 @@ namespace RealEstateGame.Controllers
             }
             else return null;
         }
+
+        [NonAction]
+        private async void SaveUser(ApplicationUser user)
+        {
+            await _userManager.UpdateAsync(user);
+        }
+
+        // Routes
+
         public IActionResult Index()
         {
             if (User.IsSignedIn())
@@ -59,5 +69,23 @@ namespace RealEstateGame.Controllers
         {
             return View();
         }
+
+        [HttpPost]
+        public IActionResult Action(string selectedAction)
+        {
+            var user = GetUser().Result;
+            switch (selectedAction)
+            {
+                case "overtime":
+                    user.WorkOvertime(_rand);
+                    break;
+                default:
+                    break;
+            }
+            SaveUser(user);
+            return RedirectToAction("Index");
+        }
+
+        
     }
 }
