@@ -10,8 +10,8 @@ namespace RealEstateGame.Models
     public class Home
     {
         public int HomeId  { get; set; }
-        [ForeignKey("ApplicationUser")]
-        public string UserId   { get;set;}
+        [ForeignKey("Player")]
+        public int PlayerId   { get;set;}
         public int Value    { get;set;}
         public string Address { get;set;}
         public int ForSale  { get;set;}

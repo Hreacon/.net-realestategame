@@ -16,5 +16,9 @@ namespace RealEstateGame.Models
             // For example, you can rename the ASP.NET Identity table names and more.
             // Add your customizations after calling base.OnModelCreating(builder);
         }
+
+        public DbSet<Player> Players { get; set; }
+        public DbSet<Home> Homes { get; set; }
+        public DbSet<Loan> Loans { get; set; }
     }
 }

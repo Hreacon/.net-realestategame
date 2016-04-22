@@ -107,16 +107,9 @@ namespace RealEstateGame.Controllers
                 var user = new ApplicationUser
                 {
                     UserName = model.UserName,
-                    Email = model.Email,
-                    Money = 1000.00,
-                    Income = 1300,
-                    Job = "McDonalds",
-                    LivingIn = "Apartment",
-                    Address = "123 Example St",
-                    Rent = 800.00,
-                    TurnNum = 0,
-                    Actions = 2,
+                    Email = model.Email
                 };
+                
                 var result = await _userManager.CreateAsync(user, model.Password);
                 if (result.Succeeded)
                 {

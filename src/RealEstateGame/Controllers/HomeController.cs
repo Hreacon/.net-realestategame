@@ -24,22 +24,50 @@ namespace RealEstateGame.Controllers
         }
 
         // Helper functions
-
         [NonAction]
         private async Task<ApplicationUser> GetUser()
         {
-            if (User.IsSignedIn())
+            ApplicationUser u = await _userManager.FindByIdAsync(User.GetUserId());
+            return u;
+        }
+        [NonAction]
+        private Player GetPlayer()
+        {
+            if (!User.IsSignedIn()) return null;
+            var userId = User.GetUserId();
+            Player player;
+            if (_context.Players.Any())
             {
-                ApplicationUser u = await _userManager.FindByIdAsync(User.GetUserId());
-                return u;
+                player = _context.Players.First(m => m.UserId == userId);
+            } else { 
+                var user = GetUser().Result;
+                player = new Player()
+                {
+                    Username = user.UserName,
+                    UserId = User.GetUserId(),
+                    Money = 1000.00,
+                    // TODO: Make the income calculated instead of set
+                    Income = 1300,
+                    Job = "Full-Time",
+                    LivingIn = "Apartment",
+                    Address = "123 Example St",
+                    // TODO: Make the rent calculated instead of set
+                    Rent = 800.00,
+                    TurnNum = 0,
+                    Actions = 2,
+                };
+                _context.Players.Add(player);
+                _context.SaveChanges();
+                player = GetPlayer();
             }
-            else return null;
+            return player;
         }
 
         [NonAction]
-        private async void SaveUser(ApplicationUser user)
+        private void SavePlayer(Player currentPlayer)
         {
-            await _userManager.UpdateAsync(user);
+            _context.Update(currentPlayer);
+            _context.SaveChanges();
         }
 
         // Routes
@@ -47,7 +75,7 @@ namespace RealEstateGame.Controllers
         public IActionResult Index()
         {
             if (User.IsSignedIn())
-                return View("MainPage", GetUser().Result);
+                return View("MainPage", GetPlayer());
             else 
             return View();
         }
@@ -73,7 +101,7 @@ namespace RealEstateGame.Controllers
         [HttpPost]
         public IActionResult Action(string selectedAction)
         {
-            var user = GetUser().Result;
+            var user = GetPlayer();
             switch (selectedAction)
             {
                 case "overtime":
@@ -82,7 +110,7 @@ namespace RealEstateGame.Controllers
                 default:
                     break;
             }
-            SaveUser(user);
+            SavePlayer(user);
             return RedirectToAction("Index");
         }
 
