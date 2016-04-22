@@ -34,6 +34,14 @@ namespace RealEstateGame.Models
         // current money on hand
         public double Money { get; set; }
 
+        // DbContext for updating homes when keeping track of turns
+        private ApplicationDbContext _context;
+        public Player() { }
+        public Player(ApplicationDbContext context)
+        {
+            _context = context;
+        }
+
         // Player decided to work overtime, give them extra income
         public void WorkOvertime(Random rand)
         {
@@ -82,7 +90,41 @@ namespace RealEstateGame.Models
                 Money = Money + Income - Rent;
                 // Incriment Turn Number
                 TurnNum++;
+                if (TurnNum%6 == 0)
+                {
+                    // every six months, a new home appears!
+                    // TODO Add Home
+                }
+                if (TurnNum%12 == 0)
+                {
+                    // every 12 months, homes get re-evaluated
+                    Revalue();
+                }
             }
+        }
+
+        private void Revalue()
+        {
+            Random rand = new Random();
+            // between -.02 and .02
+            double high = .4;
+            double sub = .2;
+            var country = rand.NextDouble();
+            while (country > high) country = rand.NextDouble();
+            country = (country - sub)/10;
+            var city = rand.NextDouble();
+            while (city > high) city = rand.NextDouble();
+            city = (city - sub)/10;
+            var homes = _context.Homes;
+            // TODO Add neighborhood 2% as well, but for now just the city/country and home
+            foreach (var home in homes)
+            {
+                var local = rand.NextDouble()/10 - .3;
+
+                home.Value = (int)Math.Floor(home.Value*(1 + (city + country + local)));
+                _context.Homes.Update(home);
+            }
+            _context.SaveChanges();
         }
         public static Player GeneratePlayer(ApplicationUser user)
         {
