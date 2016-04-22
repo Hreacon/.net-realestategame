@@ -8,9 +8,10 @@ using RealEstateGame.Models;
 namespace RealEstateGame.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20160422025558_intial")]
+    partial class intial
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
             modelBuilder
                 .HasAnnotation("ProductVersion", "7.0.0-rc1-16348")
@@ -126,8 +127,6 @@ namespace RealEstateGame.Migrations
 
                     b.Property<DateTimeOffset?>("LockoutEnd");
 
-                    b.Property<double>("Money");
-
                     b.Property<string>("NormalizedEmail")
                         .HasAnnotation("MaxLength", 256);
 
@@ -140,7 +139,7 @@ namespace RealEstateGame.Migrations
 
                     b.Property<bool>("PhoneNumberConfirmed");
 
-                    b.Property<double>("Rent");
+                    b.Property<int>("Rent");
 
                     b.Property<string>("SecurityStamp");
 

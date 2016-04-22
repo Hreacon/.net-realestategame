@@ -1,4 +1,4 @@
-﻿{
+{
   "userSecretsId": "aspnet5-RealEstateGame-bfa32dcd-8ac1-4fc0-b6ff-d5355ffe67cd",
   "version": "1.0.0-*",
   "compilationOptions": {
@@ -18,13 +18,15 @@
     "Microsoft.AspNet.StaticFiles": "1.0.0-rc1-final",
     "Microsoft.AspNet.Tooling.Razor": "1.0.0-rc1-final",
     "Microsoft.Extensions.CodeGenerators.Mvc": "1.0.0-rc1-final",
-    "Microsoft.Extensions.Configuration.FileProviderExtensions" : "1.0.0-rc1-final",
+    "Microsoft.Extensions.Configuration.FileProviderExtensions": "1.0.0-rc1-final",
     "Microsoft.Extensions.Configuration.Json": "1.0.0-rc1-final",
     "Microsoft.Extensions.Configuration.UserSecrets": "1.0.0-rc1-final",
     "Microsoft.Extensions.Logging": "1.0.0-rc1-final",
     "Microsoft.Extensions.Logging.Console": "1.0.0-rc1-final",
     "Microsoft.Extensions.Logging.Debug": "1.0.0-rc1-final",
-    "Microsoft.VisualStudio.Web.BrowserLink.Loader": "14.0.0-rc1-final"
+    "Microsoft.VisualStudio.Web.BrowserLink.Loader": "14.0.0-rc1-final",
+    "System.Collections.Immutable": "1.1.37",
+    "System.Linq": "4.0.1-beta-23516"
   },
 
   "commands": {
@@ -38,7 +40,6 @@
   },
 
   "exclude": [
-    "wwwroot",
     "node_modules"
   ],
   "publishExclude": [

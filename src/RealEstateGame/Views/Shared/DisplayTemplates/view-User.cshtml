@@ -1,0 +1,74 @@
+﻿@model RealEstateGame.Models.ApplicationUser
+
+<div>
+    <div>
+        @Model.UserName
+        <hr/>
+    </div>
+    <table>
+        <tr>
+            <td>
+                @Html.DisplayNameFor(m => m.Money)
+            </td>
+            <td>
+                @string.Format("{0:C}", Model.Money)
+            </td>
+        </tr>
+        <tr>
+            <td>
+                @Html.DisplayNameFor(m => m.Income)
+            </td>
+            <td>
+                @string.Format("{0:C}", Model.Income)
+            </td>
+        </tr>
+        <tr>
+            <td>
+                @Html.DisplayNameFor(m => m.Job)
+            </td>
+            <td>
+                @Model.Job
+            </td>
+        </tr>
+        <tr>
+            <td>
+                @Html.DisplayNameFor(m => m.LivingIn)
+            </td>
+            <td>
+                @Model.LivingIn
+            </td>
+        </tr>
+        <tr>
+            <td>
+                @Html.DisplayNameFor(m => m.Address)
+            </td>
+            <td>
+                @Model.Address
+            </td>
+        </tr>
+        <tr>
+            <td>
+                @Html.DisplayNameFor(m => m.Rent)
+            </td>
+            <td>
+                @string.Format("{0:C}", Model.Rent)
+            </td>
+        </tr>
+        <tr>
+            <td>
+                @Html.DisplayNameFor(m => m.TurnNum)
+            </td>
+            <td>
+                @Model.TurnNum
+            </td>
+        </tr>
+        <tr>
+            <td>
+                @Html.DisplayNameFor(m => m.Actions)
+            </td>
+            <td>
+                @Model.Actions
+            </td>
+        </tr>
+    </table>
+</div>

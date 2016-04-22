@@ -19,11 +19,13 @@ namespace RealEstateGame.Models
         // the address of the dwelling
         public string Address { get; set; }
         // the amount of rent you have to pay
-        public int Rent { get; set; }
+        public double Rent { get; set; }
         // Current Turn Number
         public int TurnNum { get; set; }
         // current number of action points left until the next turn
         public int Actions { get; set; }
+        // current money on hand
+        public double Money { get; set; }
     }
 
 }
