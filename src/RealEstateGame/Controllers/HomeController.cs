@@ -47,6 +47,7 @@ namespace RealEstateGame.Controllers
                 _context.SaveChanges();
                 player = GetPlayer();
             }
+            player.context = _context;
             return player;
         }
 
@@ -114,11 +115,11 @@ namespace RealEstateGame.Controllers
         [HttpPost]
         public IActionResult Action(string selectedAction)
         {
-            var user = GetPlayer();
+            var player = GetPlayer();
             switch (selectedAction)
             {
                 case "overtime":
-                    user.WorkOvertime(_rand);
+                    player.WorkOvertime(_rand);
                     break;
                 case "viewMarket":
                     return RedirectToAction("ViewMarket");
@@ -126,7 +127,7 @@ namespace RealEstateGame.Controllers
                 default:
                     break;
             }
-            SavePlayer(user);
+            SavePlayer(player);
             return RedirectToAction("Index");
         }
 

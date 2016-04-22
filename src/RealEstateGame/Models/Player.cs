@@ -35,11 +35,11 @@ namespace RealEstateGame.Models
         public double Money { get; set; }
 
         // DbContext for updating homes when keeping track of turns
-        private ApplicationDbContext _context;
-        public Player() { }
-        public Player(ApplicationDbContext context)
+        public ApplicationDbContext context;
+
+        public Player()
         {
-            _context = context;
+
         }
 
         // Player decided to work overtime, give them extra income
@@ -115,17 +115,18 @@ namespace RealEstateGame.Models
             var city = rand.NextDouble();
             while (city > high) city = rand.NextDouble();
             city = (city - sub)/10;
-            var homes = _context.Homes;
+            var homes = context.Homes;
             // TODO Add neighborhood 2% as well, but for now just the city/country and home
             foreach (var home in homes)
             {
-                var local = rand.NextDouble()/10 - .3;
+                var local = (rand.NextDouble() - .3 )/ 10 ;
 
                 home.Value = (int)Math.Floor(home.Value*(1 + (city + country + local)));
-                _context.Homes.Update(home);
+                context.Homes.Update(home);
             }
-            _context.SaveChanges();
+            context.SaveChanges();
         }
+
         public static Player GeneratePlayer(ApplicationUser user)
         {
             return new Player()
