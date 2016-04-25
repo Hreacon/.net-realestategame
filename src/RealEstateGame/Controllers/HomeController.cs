@@ -13,10 +13,10 @@ namespace RealEstateGame.Controllers
     public class HomeController : Controller
     {
         private readonly UserManager<ApplicationUser> _userManager;
-        private ApplicationDbContext _context;
-        private Random _rand;
+        private readonly ApplicationDbContext _context;
+        private readonly Random _rand;
 
-        public HomeController(ApplicationDbContext context, UserManager<ApplicationUser> userManager )
+        public HomeController(ApplicationDbContext context, UserManager<ApplicationUser> userManager)
         {
             _rand = new Random();
             _context = context;
@@ -36,16 +36,20 @@ namespace RealEstateGame.Controllers
         {
             if (!User.IsSignedIn()) return null;
             var userId = User.GetUserId();
-            Player player;
+            Player player = null;
             if (_context.Players.Any())
             {
-                player = _context.Players.First(m => m.UserId == userId);
-            } else { 
+                player = _context.Players.SingleOrDefault(m => m.UserId == userId);
+            }
+            if (player == null)
+            {
                 var user = GetUser().Result;
                 player = Player.GeneratePlayer(user);
                 _context.Players.Add(player);
                 _context.SaveChanges();
                 player = GetPlayer();
+                _context.Homes.AddRange(Home.GenerateHomes(player.PlayerId));
+                _context.SaveChanges();
             }
             player.context = _context;
             return player;
@@ -56,9 +60,9 @@ namespace RealEstateGame.Controllers
         {
             if (_context.Homes.Any())
             {
-                
-                IEnumerable<Home> homes = _context.Homes.Where(m => m.PlayerId == playerId && m.Owned == 0 && m.ForSale == 1).OrderBy(m=>m.Asking);
-                if (homes.Count() > 0)
+
+                IEnumerable<Home> homes = _context.Homes.Where(m => m.PlayerId == playerId && m.Owned == 0 && m.ForSale == 1).OrderBy(m => m.Asking);
+                if (homes.Any())
                 {
                     return homes;
                 }
@@ -81,8 +85,8 @@ namespace RealEstateGame.Controllers
         {
             if (User.IsSignedIn())
                 return View("MainPage", GetPlayer());
-            else 
-            return View();
+            else
+                return View();
         }
 
         public IActionResult ViewMarket()
@@ -93,7 +97,7 @@ namespace RealEstateGame.Controllers
             ViewBag.Homes = homes;
             return View(player);
         }
-        
+
         public IActionResult About()
         {
             ViewData["Message"] = "Your application description page.";
@@ -131,6 +135,6 @@ namespace RealEstateGame.Controllers
             return RedirectToAction("Index");
         }
 
-        
+
     }
 }
