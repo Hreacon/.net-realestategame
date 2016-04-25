@@ -40,6 +40,7 @@ namespace RealEstateGame.Models
 
         public static Home GenerateHome(int playerId, Random rand)
         {
+            // TODO Check to make sure no two addresses match
             int homeNum = rand.Next(1000, 40000);
             string Street = "MX-5 Drive";
             if (homeNum > 35000) Street = Street;

@@ -167,9 +167,7 @@ namespace RealEstateGame.Models
                 Money = Money - home.Asking;
                 home.ForSale = 0;
                 home.Owned = 1;
-                context.Homes.Update(home);
-                context.Players.Update(this);
-                context.SaveChanges();
+                HomeSaveChanges(home);
                 return true;
             }
             return false;
@@ -178,6 +176,34 @@ namespace RealEstateGame.Models
         public List<Home> GetOwnedHomes()
         {
             return context.Homes.Where(m => m.PlayerId == PlayerId && m.Owned == 1).ToList();
+        }
+
+        public void SellHome(int id)
+        {
+            var home = context.Homes.FirstOrDefault(m => m.HomeId == id);
+            if (Address == home.Address)
+            {
+                LiveInApartment();
+            }
+            Money = Money + home.Value;
+            home.ForSale = 1;
+            home.Owned = 0;
+            HomeSaveChanges(home);
+        }
+
+        public void LiveInApartment()
+        {
+            // TODO make sure player is saved elsewhere
+            Address = "123 Example St";
+            LivingIn = "Apartment";
+            Rent = 800;
+        }
+
+        public void HomeSaveChanges(Home home)
+        {
+            context.Homes.Update(home);
+            context.Players.Update(this);
+            context.SaveChanges();
         }
     }
 }

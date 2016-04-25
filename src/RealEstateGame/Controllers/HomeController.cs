@@ -110,6 +110,16 @@ namespace RealEstateGame.Controllers
             return RedirectToAction("ViewMarket");
         }
 
+        [HttpGet]
+        public IActionResult SellHome(int id)
+        {
+            if (id > 0)
+            {
+                GetPlayer().SellHome(id);
+            }
+            return RedirectToAction("Index");
+        }
+
         public IActionResult Move()
         {
             ViewBag.Homes = GetPlayer().GetOwnedHomes();
@@ -125,15 +135,14 @@ namespace RealEstateGame.Controllers
                 var home = _context.Homes.FirstOrDefault(m => m.HomeId == model.HomeId);
                 player.Address = home.Address;
                 player.Rent = 0;
+                player.LivingIn = "Owned Home";
 
             }
             else
             {
-                player.Address = "123 Example St";
-                player.Rent = 800;
+                player.LiveInApartment();
             }
 
-            player.LivingIn = model.Desctription;
             _context.Players.Update(player);
             _context.SaveChanges();
             return RedirectToAction("Index");
