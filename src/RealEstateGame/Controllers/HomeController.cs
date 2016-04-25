@@ -97,6 +97,17 @@ namespace RealEstateGame.Controllers
             ViewBag.Homes = homes;
             return View(player);
         }
+        
+        [HttpGet]
+        public IActionResult BuyHome(int id)
+        {
+            if (id > 0)
+            {
+                var player = GetPlayer();
+                player.BuyHome(id);
+            }
+            return RedirectToAction("ViewMarket");
+        }
 
         public IActionResult About()
         {

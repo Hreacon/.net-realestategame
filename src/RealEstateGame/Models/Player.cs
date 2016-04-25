@@ -123,9 +123,9 @@ namespace RealEstateGame.Models
                 var local = (rand.NextDouble() - .3)/10;
 
                 home.Value = (int) Math.Floor(home.Value*(1 + (city + country + local)));
-                if (home.Asking > home.Value)
+                if (home.Asking > home.Value && home.Owned == 0 && home.ForSale == 1)
                 {
-                    home.Asking = home.Asking - (home.Asking - home.Value/2);
+                    home.Asking = home.Asking - (home.Asking - home.Value)/2;
                 }
                 else
                 {
@@ -153,6 +153,31 @@ namespace RealEstateGame.Models
                 TurnNum = 0,
                 Actions = 2,
             };
+        }
+
+        public bool BuyHome(int homeId)
+        {
+
+            var home = context.Homes.FirstOrDefault(m => m.HomeId == homeId);
+            // check for money or loan?
+            // reduce money
+            // own home
+            if (Money > home.Asking)
+            {
+                Money = Money - home.Asking;
+                home.ForSale = 0;
+                home.Owned = 1;
+                context.Homes.Update(home);
+                context.Players.Update(this);
+                context.SaveChanges();
+                return true;
+            }
+            return false;
+        }
+
+        public List<Home> GetOwnedHomes()
+        {
+            return context.Homes.Where(m => m.PlayerId == PlayerId && m.Owned == 1).ToList();
         }
     }
 }

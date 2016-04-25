@@ -1,5 +1,8 @@
 ﻿@model RealEstateGame.Models.Player
 
+@{
+    ViewData["list-home-column"] = 12;
+}
 <div>
     <div>
         @Model.Username
@@ -71,4 +74,8 @@
             </td>
         </tr>
     </table>
+    @foreach (var home in Model.GetOwnedHomes())
+    {
+        @Html.DisplayFor(model=>home, "list-home")
+    }
 </div>

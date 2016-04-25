@@ -1,5 +1,7 @@
 ﻿@model RealEstateGame.Models.Player
-
+@{
+    ViewData["list-home-column"] = 5;
+}
 <div class="container">
     <div class="col-md-3">
         @Html.DisplayFor(m => m, "view-player")

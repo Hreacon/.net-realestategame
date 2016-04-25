@@ -1,13 +1,19 @@
 ﻿@model RealEstateGame.Models.Home
 
-<div class="list-home col-sm-5">
+<div class="list-home col-sm-@ViewData["list-home-column"]">
     <p>@Model.Address</p>
     <hr/>
     <div class="col-sm-7">
         <ul>
-            <li>Value:  @string.Format("{0:C0}", Model.Value)</li>
+            <li>Value: @string.Format("{0:C0}", Model.Value)</li>
             <li>Asking: @string.Format("{0:C0}", Model.Asking)</li>
             <li>Condition: @Model.Condition</li>
         </ul>
+    </div>
+    <div class="col-sm-5">
+        @if (Model.Owned == 0)
+        {
+            <a href="/Home/BuyHome/@Model.HomeId" class="btn btn-success">Buy This Home</a>
+        }
     </div>
 </div>
