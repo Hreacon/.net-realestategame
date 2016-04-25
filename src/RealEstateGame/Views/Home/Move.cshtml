@@ -1,0 +1,24 @@
+﻿@model RealEstateGame.ViewModels.PlayerActions.MoveViewModel
+@{
+    ViewData["list-home-column"] = 12;
+}
+@using (Html.BeginForm("Move", "Home", FormMethod.Post))
+{
+    @Html.HiddenFor(m=>Model.HomeId)
+    <h2>Where would you like to live?</h2>
+    <ul>
+        <li>
+            <button name="Description" value="Apartment" onclick="this.form.submit()">123 Example St, Apartment, $800/mo</button>
+        </li>
+    </ul>
+}
+
+@using (Html.BeginForm("Move", "Home", FormMethod.Post))
+{
+    @Html.Hidden("Description", "Owned Home")
+    foreach (var home in ViewBag.Homes)
+    {
+        @Html.DisplayFor(model=>home, "list-home-moving")
+    }
+}
+

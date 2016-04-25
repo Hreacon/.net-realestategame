@@ -7,6 +7,7 @@ using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.AspNet.Mvc;
 using RealEstateGame.Models;
+using RealEstateGame.ViewModels.PlayerActions;
 
 namespace RealEstateGame.Controllers
 {
@@ -109,6 +110,35 @@ namespace RealEstateGame.Controllers
             return RedirectToAction("ViewMarket");
         }
 
+        public IActionResult Move()
+        {
+            ViewBag.Homes = GetPlayer().GetOwnedHomes();
+            return View();
+        }
+
+        [HttpPost]
+        public IActionResult Move(MoveViewModel model)
+        {
+            var player = GetPlayer();
+            if (model.HomeId > 0)
+            {
+                var home = _context.Homes.FirstOrDefault(m => m.HomeId == model.HomeId);
+                player.Address = home.Address;
+                player.Rent = 0;
+
+            }
+            else
+            {
+                player.Address = "123 Example St";
+                player.Rent = 800;
+            }
+
+            player.LivingIn = model.Desctription;
+            _context.Players.Update(player);
+            _context.SaveChanges();
+            return RedirectToAction("Index");
+        }
+
         public IActionResult About()
         {
             ViewData["Message"] = "Your application description page.";
@@ -138,6 +168,9 @@ namespace RealEstateGame.Controllers
                     break;
                 case "viewMarket":
                     return RedirectToAction("ViewMarket");
+                    break;
+                case "move":
+                    return RedirectToAction("Move");
                     break;
                 default:
                     break;

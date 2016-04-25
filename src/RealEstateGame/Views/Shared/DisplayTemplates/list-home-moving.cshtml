@@ -1,0 +1,16 @@
+﻿@model RealEstateGame.Models.Home
+
+<div class="list-home col-sm-@ViewData["list-home-column"]">
+    <p>@Model.Address</p>
+    <hr />
+    <div class="col-sm-7">
+        <ul>
+            <li>Value: @string.Format("{0:C0}", Model.Value)</li>
+            <li>Asking: @string.Format("{0:C0}", Model.Asking)</li>
+            <li>Condition: @Model.Condition</li>
+        </ul>
+    </div>
+    <div class="col-sm-5">
+        <button name="HomeId" value="@Model.HomeId" onclick="this.form.submit()">Move Here</button>
+    </div>
+</div>
