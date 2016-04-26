@@ -154,5 +154,60 @@ namespace RealEstateGame.Models
                 Actions = 2,
             };
         }
+
+        public void BuyHome(int id)
+        {
+            var home = GetHome(id);
+            if (home.Asking < Money)
+            {
+                Money = Money - home.Asking;
+                home.Owned = 1;
+                home.ForSale = 0;
+                SavePlayerAndHome(home);
+            }
+        }
+
+        public void SellHome(int id)
+        {
+            var home = GetHome(id);
+            if (home.Owned == 1)
+            {
+                Money = Money + home.Value;
+                home.Owned = 0;
+                home.ForSale = 1;
+                // TODO make this more realistic
+                SavePlayerAndHome(home);
+            }
+        }
+
+        public void SavePlayerAndHome(Home home)
+        {
+            context.Update(home);
+            context.Update(this);
+            context.SaveChanges();
+        }
+
+        public void MoveIntoApartment()
+        {
+            LivingIn = "Apartment";
+            Address = "123 Example St";
+            Rent = 800;
+            context.Update(this);
+            context.SaveChanges();
+        }
+
+        public void MoveIntoHome(int id)
+        {
+            var home = GetHome(id);
+            LivingIn = "Owned Home";
+            Address = home.Address;
+            Rent = 0;
+            SavePlayerAndHome(home);
+        }
+
+        public Home GetHome(int id)
+        {
+            return context.Homes.FirstOrDefault(m => m.HomeId == id);
+        }
     }
 }
