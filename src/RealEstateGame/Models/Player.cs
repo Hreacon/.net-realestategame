@@ -125,7 +125,7 @@ namespace RealEstateGame.Models
                 home.Value = (int) Math.Floor(home.Value*(1 + (city + country + local)));
                 if (home.Asking > home.Value)
                 {
-                    home.Asking = home.Asking - (home.Asking - home.Value/2);
+                    home.Asking = home.Asking - (home.Asking - home.Value)/2;
                 }
                 else
                 {
@@ -175,6 +175,7 @@ namespace RealEstateGame.Models
                 Money = Money + home.Value;
                 home.Owned = 0;
                 home.ForSale = 1;
+                home.Asking = home.Value + home.Value/10;
                 // TODO make this more realistic
                 SavePlayerAndHome(home);
             }
@@ -203,6 +204,11 @@ namespace RealEstateGame.Models
             Address = home.Address;
             Rent = 0;
             SavePlayerAndHome(home);
+        }
+
+        public IEnumerable<Home> GetOwnedHomes()
+        {
+            return context.Homes.Where(m => m.PlayerId == PlayerId && m.Owned == 1);
         }
 
         public Home GetHome(int id)

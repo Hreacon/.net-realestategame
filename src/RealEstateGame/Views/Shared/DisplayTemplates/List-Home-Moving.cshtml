@@ -11,13 +11,6 @@
         </ul>
     </div>
     <div class="col-sm-5">
-        @if (Model.Owned == 0 && Model.ForSale == 1)
-        {
-            <a href="/home/buyhome/@Model.HomeId" class="btn btn-success">Buy This Home</a>
-        }
-        else
-        {
-            <a href="/home/sellhome/@Model.HomeId" class="btn btn-danger">Sell This Home</a>
-        }
+        <button name="homeId" value="@Model.HomeId">Move Into Home</button>
     </div>
 </div>

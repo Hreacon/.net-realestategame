@@ -3,6 +3,11 @@
 <div class="containter">
     <div class="col-md-6">
         @Html.DisplayFor(m => m, "view-player")
+
+        @foreach (var home in Model.GetOwnedHomes())
+        {
+            @Html.DisplayFor(m => home, "list-home")
+        }
     </div>
     <div class="col-md-6">
         @Html.Partial("MainControls")

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using Microsoft.AspNet.Http.Internal;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.AspNet.Mvc;
@@ -52,7 +53,7 @@ namespace RealEstateGame.Controllers
         }
 
         [NonAction]
-        private IEnumerable<Home> GetHomes(int playerId)
+        private IEnumerable<Home> GetHomesForSale(int playerId)
         {
             if (_context.Homes.Any())
             {
@@ -65,7 +66,7 @@ namespace RealEstateGame.Controllers
             }
             _context.Homes.AddRange(Home.GenerateHomes(playerId));
             _context.SaveChanges();
-            return GetHomes(playerId);
+            return GetHomesForSale(playerId);
         }
 
         [NonAction]
@@ -89,7 +90,7 @@ namespace RealEstateGame.Controllers
         {
             if (!User.IsSignedIn()) return RedirectToAction("Index");
             var player = GetPlayer();
-            var homes = GetHomes(player.PlayerId);
+            var homes = GetHomesForSale(player.PlayerId);
             ViewBag.Homes = homes;
             return View(player);
         }
@@ -112,6 +113,42 @@ namespace RealEstateGame.Controllers
             return View();
         }
 
+        public IActionResult BuyHome(int id)
+        {
+            GetPlayer().BuyHome(id);
+            return RedirectToAction("ViewMarket");
+        }
+
+        public IActionResult SellHome(int id)
+        {
+            GetPlayer().SellHome(id);
+            return RedirectToAction("Index");
+        }
+
+        public IActionResult Move()
+        {
+            var player = GetPlayer();
+            ViewBag.Homes = player.GetOwnedHomes();
+            return View(player);
+        }
+
+        [HttpPost]
+        public IActionResult Move(FormCollection collection)
+        {
+            var desc = Request.Form["Description"];
+            int HomeId = 0;
+            Int32.TryParse(Request.Form["homeId"], out HomeId);
+            if (HomeId > 0)
+            {
+                GetPlayer().MoveIntoHome(HomeId);
+            }
+            else
+            {
+                GetPlayer().MoveIntoApartment();
+            }
+            return RedirectToAction("Index");
+        }
+
         [HttpPost]
         public IActionResult Action(string selectedAction)
         {
@@ -124,6 +161,8 @@ namespace RealEstateGame.Controllers
                 case "viewMarket":
                     return RedirectToAction("ViewMarket");
                     break;
+                case "moving":
+                    return RedirectToAction("Move");
                 default:
                     break;
             }

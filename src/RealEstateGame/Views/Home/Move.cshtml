@@ -1,0 +1,22 @@
+﻿@model RealEstateGame.Models.Player
+
+<div class="container">
+    <div class="col-md-3">
+        @Html.DisplayFor(m => m, "view-player")
+        @using (Html.BeginForm("Move", "Home", FormMethod.Post))
+        {
+            @Html.Hidden("Description", "Apartment")
+            <button class="btn btn-danger" name="HomeId" value="0">Apartment: $800/mo</button>
+        }
+    </div>
+    @using (Html.BeginForm("Move", "Home", FormMethod.Post))
+    {
+        @Html.Hidden("Description", "Owned Home")
+        <div class="col-md-9">
+            @foreach (var home in Model.GetOwnedHomes())
+            {
+                @Html.DisplayFor(model => home, "list-home-moving")
+            }
+        </div>
+    }
+</div>
