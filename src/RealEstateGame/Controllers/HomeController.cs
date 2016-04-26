@@ -47,6 +47,9 @@ namespace RealEstateGame.Controllers
                 _context.Players.Add(player);
                 _context.SaveChanges();
                 player = GetPlayer();
+                _context.Homes.AddRange(Home.GenerateHomes(player.PlayerId));
+                // TODO Generate renters
+                _context.SaveChanges();
             }
             player.context = _context;
             return player;

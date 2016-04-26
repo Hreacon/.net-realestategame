@@ -172,6 +172,11 @@ namespace RealEstateGame.Models
             var home = GetHome(id);
             if (home.Owned == 1)
             {
+                if (Address == home.Address)
+                {
+                    // player lives in house, they sell the home they move into an apartment
+                    MoveIntoApartment();
+                }
                 Money = Money + home.Value;
                 home.Owned = 0;
                 home.ForSale = 1;
