@@ -69,5 +69,23 @@ namespace RealEstateGame.Models
                 Owned = 0
             };
         }
+
+
+        public double GetCostImprovement()
+        {
+            if (Condition < 10)
+                return Value/100;
+            return 0;
+        }
+
+        public void Improve()
+        {
+            if (Condition < 10)
+            {
+                Condition = Condition + 1;
+                Random rand = new Random();
+                Value = Value*(1 + (Condition*(1 + (rand.Next(0, 20) - 10)/100))/100);
+            }
+        }
     }
 }
