@@ -71,14 +71,7 @@ namespace RealEstateGame.Controllers
             _context.SaveChanges();
             return GetHomesForSale(playerId);
         }
-
-        [NonAction]
-        private void SavePlayer(Player currentPlayer)
-        {
-            _context.Update(currentPlayer);
-            _context.SaveChanges();
-        }
-
+        
         // Routes
 
         public IActionResult Index()
@@ -169,7 +162,7 @@ namespace RealEstateGame.Controllers
                 default:
                     break;
             }
-            SavePlayer(player);
+            player.Save();
             return RedirectToAction("Index");
         }
 

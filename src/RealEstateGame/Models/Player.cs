@@ -189,6 +189,11 @@ namespace RealEstateGame.Models
         public void SavePlayerAndHome(Home home)
         {
             context.Update(home);
+            Save();
+        }
+        
+        private void Save()
+        {
             context.Update(this);
             context.SaveChanges();
         }
@@ -198,8 +203,7 @@ namespace RealEstateGame.Models
             LivingIn = "Apartment";
             Address = "123 Example St";
             Rent = 800;
-            context.Update(this);
-            context.SaveChanges();
+            Save();
         }
 
         public void MoveIntoHome(int id)
