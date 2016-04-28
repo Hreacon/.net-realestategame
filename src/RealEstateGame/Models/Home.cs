@@ -70,6 +70,20 @@ namespace RealEstateGame.Models
             };
         }
 
+        public void Revalue(double city, double country, Random rand)
+        {
+            var local = (rand.NextDouble() - .3) / 10;
+
+            Value = (int)Math.Floor(Value * (1 + (city + country + local)));
+            if (Asking > Value)
+            {
+                Asking = Asking - (Asking - Value) / 2;
+            }
+            else
+            {
+                Asking = Value;
+            }
+        }
 
         public double GetCostImprovement()
         {
