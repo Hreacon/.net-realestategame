@@ -33,14 +33,22 @@ namespace RealEstateGame.Controllers
         }
 
         [NonAction]
-        private Player GetPlayer()
+        private Player GetPlayer(bool makeNew = false)
         {
             if (!User.IsSignedIn()) return null;
             var userId = User.GetUserId();
             Player player;
-            if (_context.Players.Any())
+            if (_context.Players.Any() && !makeNew)
             {
-                player = _context.Players.First(m => m.UserId == userId);
+                try
+                {
+                    player = _context.Players.First(m => m.UserId == userId);
+                }
+                catch
+                {
+                    return GetPlayer(true);
+                }
+                    
             } else { 
                 var user = GetUser().Result;
                 player = Player.GeneratePlayer(user);
@@ -128,6 +136,21 @@ namespace RealEstateGame.Controllers
             return View(player);
         }
 
+        public IActionResult Improve()
+        {
+            var player = GetPlayer();
+            ViewBag.Homes = player.GetOwnedHomes();
+            return View(player);
+        }
+
+        [HttpPost]
+        public IActionResult Improve(FormCollection collection)
+        {
+            var player = GetPlayer();
+            player.ImproveHome(Int32.Parse(Request.Form["homeId"]));
+            return RedirectToAction("Improve");
+        }
+
         [HttpPost]
         public IActionResult Move(FormCollection collection)
         {
@@ -145,6 +168,7 @@ namespace RealEstateGame.Controllers
             return RedirectToAction("Index");
         }
 
+
         [HttpPost]
         public IActionResult Action(string selectedAction)
         {
@@ -159,6 +183,13 @@ namespace RealEstateGame.Controllers
                     break;
                 case "moving":
                     return RedirectToAction("Move");
+                    break;
+                case "improve":
+                    return RedirectToAction("Improve");
+                    break;
+                case "skipturn":
+                    GetPlayer().SkipTurn();
+                    return RedirectToAction("Index");
                 default:
                     break;
             }
