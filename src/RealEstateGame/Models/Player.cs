@@ -53,6 +53,18 @@ namespace RealEstateGame.Models
             UseAction();
         }
 
+        public void ImproveHome(int id)
+        {
+            var home = GetHome(id);
+            if (home.Owned == 1 && home.GetCostImprovement() <= Money)
+            {
+                UseAction();
+                Money = Money - home.GetCostImprovement();
+                home.Improve();
+                SavePlayerAndHome(home);
+            }
+        }
+
         // Player has used an action point.
         public void UseAction()
         {
@@ -110,30 +122,24 @@ namespace RealEstateGame.Models
             // between -.02 and .02
             double high = .4;
             double sub = .2;
-            var country = rand.NextDouble();
-            while (country > high) country = rand.NextDouble();
-            country = (country - sub)/10;
-            var city = rand.NextDouble();
-            while (city > high) city = rand.NextDouble();
-            city = (city - sub)/10;
+            var country = GeneratePercent(sub, high, rand);
+            var city = GeneratePercent(sub, high, rand);
             var homes = context.Homes;
             // TODO Add neighborhood 2% as well, but for now just the city/country and home
             foreach (var home in homes)
             {
-                var local = (rand.NextDouble() - .3)/10;
-
-                home.Value = (int) Math.Floor(home.Value*(1 + (city + country + local)));
-                if (home.Asking > home.Value)
-                {
-                    home.Asking = home.Asking - (home.Asking - home.Value)/2;
-                }
-                else
-                {
-                    home.Asking = home.Value;
-                }
+                home.Revalue(city, country, rand);
                 context.Homes.Update(home);
             }
             context.SaveChanges();
+        }
+
+        public double GeneratePercent(double sub, double high, Random rand)
+        {
+            double output = 0;
+            while (output > high) output = rand.NextDouble();
+            output = (output - sub) / 10;
+            return output;
         }
 
         public static Player GeneratePlayer(ApplicationUser user)
@@ -192,10 +198,17 @@ namespace RealEstateGame.Models
             Save();
         }
         
-        private void Save()
+        public void Save()
         {
             context.Update(this);
             context.SaveChanges();
+        }
+
+        public void SkipTurn()
+        {
+            Actions = 0;
+            NextTurn();
+            Save();
         }
 
         public void MoveIntoApartment()
