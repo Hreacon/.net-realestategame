@@ -12,7 +12,7 @@ namespace RealEstateGame.Models
         [ForeignKey("Player")]
         public int PlayerId   { get;set;}
         // Value of the home
-        public int Value    { get;set;}
+        public double Value    { get;set;}
         // Street Address, 123 Example St
         public string Address { get;set;}
         // 1 if true 0 if not
@@ -21,9 +21,9 @@ namespace RealEstateGame.Models
         public int Rented   { get;set;}
         public int Owned     { get; set; }
         // amount of rent gained per month
-        public int Rent     { get;set;}
+        public double Rent     { get;set;}
         // amount asking for sale price
-        public int Asking   { get;set;}
+        public double Asking   { get;set;}
         // 0 is broken 10 is fully upgraded
         public int Condition { get;set;}
 
@@ -88,17 +88,24 @@ namespace RealEstateGame.Models
         public double GetCostImprovement()
         {
             if (Condition < 10)
-                return Value/100;
+                return Value/100 * Condition;
             return 0;
         }
 
-        public void Improve()
+        public void Improve(Random rand = null)
         {
             if (Condition < 10)
             {
+                if (rand == null)
+                {
+                    rand = new Random();
+                }
+                double random = rand.Next(0, 20) - 10;
+                if (random < -3) random += 3;
+                double variance = 1 + random/100;
+                double multi = (1 + (Condition * (variance) / 100));
+                Value = Value*multi;
                 Condition = Condition + 1;
-                Random rand = new Random();
-                Value = Value*(1 + (Condition*(1 + (rand.Next(0, 20) - 10)/100))/100);
             }
         }
     }
