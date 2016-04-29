@@ -1,5 +1,7 @@
 ﻿@model RealEstateGame.Models.Player
-
+@{
+    ViewData["Button"] = "Move";
+}
 <div class="container">
     <div class="col-md-3">
         @Html.DisplayFor(m => m, "view-player")
@@ -15,7 +17,7 @@
         <div class="col-md-9">
             @foreach (var home in Model.GetOwnedHomes())
             {
-                @Html.DisplayFor(model => home, "list-home-moving")
+                @Html.DisplayFor(model => home, "list-home-move")
             }
         </div>
     }
