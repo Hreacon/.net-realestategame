@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using Microsoft.AspNet.Authorization;
 using Microsoft.AspNet.Http.Internal;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
@@ -64,6 +65,7 @@ namespace RealEstateGame.Controllers
         }
 
         [NonAction]
+        [Authorize(Roles = "Player")]
         private IEnumerable<Home> GetHomesForSale(int playerId)
         {
             if (_context.Homes.Any())
@@ -90,6 +92,7 @@ namespace RealEstateGame.Controllers
             return View();
         }
 
+        [Authorize(Roles = "Player")]
         public IActionResult ViewMarket()
         {
             if (!User.IsSignedIn()) return RedirectToAction("Index");
@@ -117,18 +120,21 @@ namespace RealEstateGame.Controllers
             return View();
         }
 
+        [Authorize(Roles = "Player")]
         public IActionResult BuyHome(int id)
         {
             GetPlayer().BuyHome(id);
             return RedirectToAction("ViewMarket");
         }
 
+        [Authorize(Roles = "Player")]
         public IActionResult SellHome(int id)
         {
             GetPlayer().SellHome(id);
             return RedirectToAction("Index");
         }
 
+        [Authorize(Roles = "Player")]
         public IActionResult Move()
         {
             var player = GetPlayer();
@@ -136,6 +142,7 @@ namespace RealEstateGame.Controllers
             return View(player);
         }
 
+        [Authorize(Roles = "Player")]
         public IActionResult Improve()
         {
             var player = GetPlayer();
@@ -144,6 +151,7 @@ namespace RealEstateGame.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "Player")]
         public IActionResult Improve(FormCollection collection)
         {
             var player = GetPlayer();
@@ -152,9 +160,9 @@ namespace RealEstateGame.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "Player")]
         public IActionResult Move(FormCollection collection)
         {
-            var desc = Request.Form["Description"];
             int HomeId = 0;
             Int32.TryParse(Request.Form["homeId"], out HomeId);
             if (HomeId > 0)
@@ -168,8 +176,22 @@ namespace RealEstateGame.Controllers
             return RedirectToAction("Index");
         }
 
+        [Authorize(Roles = "Player")]
+        public IActionResult ManageJobs()
+        {
+            return View(GetPlayer());
+        }
 
         [HttpPost]
+        public IActionResult ManageJobs(FormCollection collection)
+        { 
+            GetPlayer().SetJob(Request.Form["newJob"]);
+            return RedirectToAction("Index");
+        }
+
+
+        [HttpPost]
+        [Authorize(Roles = "Player")]
         public IActionResult Action(string selectedAction)
         {
             var player = GetPlayer();
@@ -190,10 +212,11 @@ namespace RealEstateGame.Controllers
                 case "skipturn":
                     GetPlayer().SkipTurn();
                     return RedirectToAction("Index");
+                case "managejob":
+                    return RedirectToAction("ManageJobs");
                 default:
                     break;
             }
-            player.Save();
             return RedirectToAction("Index");
         }
 

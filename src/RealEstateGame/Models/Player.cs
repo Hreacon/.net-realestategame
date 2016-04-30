@@ -35,11 +35,16 @@ namespace RealEstateGame.Models
         public double Money { get; set; }
 
         // DbContext for updating homes when keeping track of turns
-        public ApplicationDbContext context;
+        [NotMapped] public ApplicationDbContext context;
+
+        [NotMapped] private List<string> Jobs;
 
         public Player()
         {
-
+            Jobs = new List<string>();
+            Jobs.Add("Full-Time");
+            Jobs.Add("Part-Time");
+            Jobs.Add("Self Employed");
         }
 
         // Player decided to work overtime, give them extra income
@@ -83,21 +88,10 @@ namespace RealEstateGame.Models
             if (Actions <= 0)
             {
                 // replenish action points
-                switch (Job)
-                {
-                    case "Full-Time":
-                        Actions = 2;
-                        break;
-                    case "Part-Time":
-                        Actions = 5;
-                        break;
-                    case "None":
-                        Actions = 8;
-                        break;
-                    default:
-                        Actions = 2;
-                        break;
-                }
+                if (Job == Jobs[0]) Actions = 2;
+                if (Job == Jobs[1]) Actions = 5;
+                if (Job == Jobs[2]) Actions = 8;
+                
                 // add income
                 Money = Money + Income - Rent;
                 // Incriment Turn Number
@@ -209,6 +203,31 @@ namespace RealEstateGame.Models
             Actions = 0;
             NextTurn();
             Save();
+        }
+
+        public void SetJob(string job)
+        {
+            if (Jobs.Contains(job))
+            {
+                Job = job;
+                if (job == Jobs[0]) Income = 1300;
+                if (job == Jobs[1]) Income = 700;
+                if (job == Jobs[2]) Income = 0;
+            }
+            Save();
+        }
+
+        public List<string> GetPotentialJobs()
+        {
+            List<string> output = new List<string>();
+            foreach (var job in Jobs)
+            {
+                if (job != Job)
+                {
+                    output.Add(job);
+                }
+            }
+            return output;
         }
 
         public void MoveIntoApartment()
