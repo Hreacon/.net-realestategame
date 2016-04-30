@@ -108,5 +108,19 @@ namespace RealEstateGame.Models
                 Condition = Condition + 1;
             }
         }
+
+        public void Degrade(Random rand = null)
+        {
+            if (Condition > 0)
+            {
+                if(rand == null) rand = new Random();
+                double random = rand.Next(0, 20) - 10;
+                if (random < -3) random += 3;
+                double variance = 1 - random / 100;
+                double multi = (1 - (Condition * (variance) / 100));
+                Value = Value * multi;
+                Condition = Condition - 1;
+            }
+        }
     }
 }

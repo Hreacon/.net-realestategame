@@ -79,6 +79,7 @@ namespace RealEstateGame.Models
                 // User is out of actions, change turns
                 NextTurn();
             }
+            Save();
         }
 
         // Player advances to the next turn
@@ -87,20 +88,38 @@ namespace RealEstateGame.Models
             // make sure the turn is over
             if (Actions <= 0)
             {
+                // Generate a random number generator
+                Random rand = new Random();
+
                 // replenish action points
                 if (Job == Jobs[0]) Actions = 2;
-                if (Job == Jobs[1]) Actions = 5;
-                if (Job == Jobs[2]) Actions = 8;
+                else if (Job == Jobs[1]) Actions = 5;
+                else if (Job == Jobs[2]) Actions = 8;
                 
                 // add income
                 Money = Money + Income - Rent;
+
                 // Incriment Turn Number
                 TurnNum++;
                 if (TurnNum%6 == 0)
                 {
                     // every six months, a new home appears!
-                    context.Homes.Add(Home.GenerateHome(PlayerId, new Random()));
+                    context.Homes.Add(Home.GenerateHome(PlayerId, rand));
                     context.SaveChanges();
+
+                    // every six months, chance of home loosing condition point!
+                    int chance = 10;
+                    foreach (var home in GetOwnedHomes())
+                    {
+                        var inchance = chance;
+                        if (home.Rented == 1) inchance = inchance*2;
+                        if (Randomly(inchance, rand))
+                        {
+                            home.Degrade(rand);
+                            context.Homes.Update(home);
+                        }
+                    }
+                    Save();
                 }
                 if (TurnNum%12 == 0)
                 {
@@ -108,6 +127,12 @@ namespace RealEstateGame.Models
                     Revalue();
                 }
             }
+        }
+
+        public bool Randomly(int maxvalue, Random rand = null)
+        {
+            if(rand == null) rand = new Random();
+            return rand.Next(0, maxvalue) == maxvalue/2;
         }
 
         private void Revalue()
@@ -211,8 +236,8 @@ namespace RealEstateGame.Models
             {
                 Job = job;
                 if (job == Jobs[0]) Income = 1300;
-                if (job == Jobs[1]) Income = 700;
-                if (job == Jobs[2]) Income = 0;
+                else if (job == Jobs[1]) Income = 700;
+                else if (job == Jobs[2]) Income = 0;
             }
             Save();
         }
