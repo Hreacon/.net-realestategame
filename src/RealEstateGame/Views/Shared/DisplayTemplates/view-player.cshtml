@@ -67,7 +67,7 @@
                 @Html.DisplayNameFor(m => m.Actions)
             </td>
             <td>
-                @Model.Actions
+                @Model.Actions | @Model.GetHomeForSaleCount()
             </td>
         </tr>
     </table>

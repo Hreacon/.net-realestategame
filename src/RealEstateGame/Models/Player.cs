@@ -99,6 +99,15 @@ namespace RealEstateGame.Models
                 // add income
                 Money = Money + Income - Rent;
 
+                // randomly houses change for sale status
+                foreach (var home in context.Homes.Where(m => m.PlayerId == PlayerId && m.Owned == 0).ToList())
+                {
+                    if (Randomly(250, rand))
+                    {
+                        home.ForSale = home.ForSale == 1 ? 0 : 1;
+                    }
+                }
+
                 // Incriment Turn Number
                 TurnNum++;
                 if (TurnNum%6 == 0)
@@ -119,13 +128,13 @@ namespace RealEstateGame.Models
                             context.Homes.Update(home);
                         }
                     }
-                    Save();
                 }
                 if (TurnNum%12 == 0)
                 {
                     // every 12 months, homes get re-evaluated
                     Revalue();
                 }
+                Save();
             }
         }
 
@@ -151,6 +160,11 @@ namespace RealEstateGame.Models
                 context.Homes.Update(home);
             }
             context.SaveChanges();
+        }
+
+        public int GetHomeForSaleCount()
+        {
+            return context.Homes.Where(m => m.PlayerId == PlayerId && m.ForSale == 1).ToList().Count;
         }
 
         public double GeneratePercent(double sub, double high, Random rand)
