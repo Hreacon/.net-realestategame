@@ -1,0 +1,7 @@
+﻿
+<a href="/" data-target="#rightside" class="btn btn-success"> Return Home</a>
+
+@foreach (var home in ViewBag.Homes)
+{
+    @Html.DisplayFor(model => home, "list-home")
+}

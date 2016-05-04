@@ -5,9 +5,6 @@
         @Html.DisplayFor(m => m, "view-player")
     </div>
     <div class="col-md-9">
-        @foreach (var home in ViewBag.Homes)
-        {
-            @Html.DisplayFor(model => home, "list-home")
-        }
+        @Html.Partial("MarketPartial")
     </div>
 </div>

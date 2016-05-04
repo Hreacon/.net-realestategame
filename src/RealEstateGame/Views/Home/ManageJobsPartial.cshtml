@@ -1,0 +1,8 @@
+﻿
+@using (Html.BeginForm("ManageJobs", "Home", FormMethod.Post))
+{
+    foreach (var job in Model.GetPotentialJobs())
+    {
+        <button name="newJob" onclick="this.form.submit()" value="@job">@job</button>
+    }
+}

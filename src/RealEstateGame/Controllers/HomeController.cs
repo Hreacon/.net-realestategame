@@ -18,7 +18,7 @@ namespace RealEstateGame.Controllers
         private ApplicationDbContext _context;
         private Random _rand;
 
-        public HomeController(ApplicationDbContext context, UserManager<ApplicationUser> userManager )
+        public HomeController(ApplicationDbContext context, UserManager<ApplicationUser> userManager)
         {
             _rand = new Random();
             _context = context;
@@ -49,7 +49,6 @@ namespace RealEstateGame.Controllers
                 {
                     return GetPlayer(true);
                 }
-                    
             } else { 
                 var user = GetUser().Result;
                 player = Player.GeneratePlayer(user);
@@ -70,7 +69,6 @@ namespace RealEstateGame.Controllers
         {
             if (_context.Homes.Any())
             {
-                
                 IEnumerable<Home> homes = _context.Homes.Where(m => m.PlayerId == playerId && m.Owned == 0 && m.ForSale == 1).OrderBy(m=>m.Asking);
                 if (homes.Count() > 0)
                 {
@@ -87,19 +85,26 @@ namespace RealEstateGame.Controllers
         public IActionResult Index()
         {
             if (User.IsSignedIn())
-                return View("MainPage", GetPlayer());
-            else 
+            {
+                ViewData["partial"] = "MainControls";
+                ViewBag.Player = GetPlayer();
+                return View("MainPage");
+            }
             return View();
         }
 
         [Authorize(Roles = "Player")]
-        public IActionResult ViewMarket()
+        public IActionResult ViewMarket(string ajax)
         {
-            if (!User.IsSignedIn()) return RedirectToAction("Index");
             var player = GetPlayer();
             var homes = GetHomesForSale(player.PlayerId);
-            ViewBag.Homes = homes;
-            return View(player);
+            if (ajax == "true")
+            {
+                return View("MarketPartial", homes);
+            }
+            ViewBag.Player = player;
+            ViewData["partial"] = "MarketPartial";
+            return View("MainPage", homes);
         }
         
         public IActionResult About()
@@ -177,8 +182,12 @@ namespace RealEstateGame.Controllers
         }
 
         [Authorize(Roles = "Player")]
-        public IActionResult ManageJobs()
+        public IActionResult ManageJobs(string ajax)
         {
+            if (ajax == "true")
+            {
+                return View("ManageJobsPartial", GetPlayer());
+            }
             return View(GetPlayer());
         }
 

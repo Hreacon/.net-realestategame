@@ -5,12 +5,6 @@
         @Html.DisplayFor(m => m, "view-player")
     </div>
     <div class="col-md-6">
-        @using (Html.BeginForm("ManageJobs", "Home", FormMethod.Post))
-        {
-            foreach (var job in Model.GetPotentialJobs())
-            {
-                <button name="newJob" onclick="this.form.submit()" value="@job">@job</button>
-            }
-        }
+        @Html.Partial("ManageJobsPartial", Model)
     </div>
 </div>
