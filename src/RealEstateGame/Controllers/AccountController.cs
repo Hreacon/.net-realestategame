@@ -117,6 +117,7 @@ namespace RealEstateGame.Controllers
                         UserName = "Admin",
                         Email = "01010010r@gmail.com"
                     }, "!23Qwer");
+                    // TODO add role to this user for admin privaledges
                 }
 
                 var result = await _userManager.CreateAsync(user, model.Password);
