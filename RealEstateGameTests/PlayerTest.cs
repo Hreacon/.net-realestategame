@@ -12,7 +12,6 @@ namespace RealEstateGameTests
         [Fact]
         public void PlayerCanGenerate()
         {
-
             var player = GetPlayer();
             Assert.Equal("test", player.Username);
             Assert.Equal(1000.00, player.Money); // generated in the GeneratePlayer() method

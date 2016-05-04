@@ -105,11 +105,14 @@ namespace RealEstateGame.Models
                 Money = Money + Income - Rent;
 
                 // randomly houses change for sale status
-                foreach (var home in context.Homes.Where(m => m.PlayerId == PlayerId && m.Owned == 0).ToList())
+                if (HaveContext())
                 {
-                    if (Randomly(250, rand))
+                    foreach (var home in context.Homes.Where(m => m.PlayerId == PlayerId && m.Owned == 0).ToList())
                     {
-                        home.ForSale = home.ForSale == 1 ? 0 : 1;
+                        if (Randomly(250, rand))
+                        {
+                            home.ForSale = home.ForSale == 1 ? 0 : 1;
+                        }
                     }
                 }
 
@@ -118,8 +121,12 @@ namespace RealEstateGame.Models
                 if (TurnNum%6 == 0)
                 {
                     // every six months, a new home appears!
-                    context.Homes.Add(Home.GenerateHome(PlayerId, rand));
-                    context.SaveChanges();
+                    if (HaveContext())
+                    {
+                        context.Homes.Add(Home.GenerateHome(PlayerId, rand));
+                        Save();
+                    }
+
 
                     // every six months, chance of home loosing condition point!
                     int chance = 10;
@@ -232,14 +239,20 @@ namespace RealEstateGame.Models
 
         public void SavePlayerAndHome(Home home)
         {
-            context.Update(home);
-            Save();
+            if (HaveContext())
+            {
+                context.Update(home);
+                Save();
+            }
         }
         
         public void Save()
         {
-            context.Update(this);
-            context.SaveChanges();
+            if (HaveContext())
+            {
+                context.Update(this);
+                context.SaveChanges();
+            }
         }
 
         public void SkipTurn()
@@ -301,12 +314,25 @@ namespace RealEstateGame.Models
 
         public IEnumerable<Home> GetOwnedHomes()
         {
-            return context.Homes.Where(m => m.PlayerId == PlayerId && m.Owned == 1);
+            if (HaveContext())
+            {
+                return context.Homes.Where(m => m.PlayerId == PlayerId && m.Owned == 1);
+            }
+            return null;
         }
 
         public Home GetHome(int id)
         {
-            return context.Homes.FirstOrDefault(m => m.HomeId == id);
+            if (HaveContext())
+            {
+                return context.Homes.FirstOrDefault(m => m.HomeId == id);
+            }
+            return null;
+        }
+
+        public bool HaveContext()
+        {
+            return context != null;
         }
     }
 }
