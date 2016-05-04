@@ -47,6 +47,11 @@ namespace RealEstateGame.Models
             Jobs.Add("Self Employed");
         }
 
+        public bool IsSelfEmployed()
+        {
+            return Job == Jobs[2];
+        }
+
         // Player decided to work overtime, give them extra income
         public void WorkOvertime(Random rand)
         {
@@ -249,8 +254,16 @@ namespace RealEstateGame.Models
             if (Jobs.Contains(job))
             {
                 Job = job;
-                if (job == Jobs[0]) Income = 1300;
-                else if (job == Jobs[1]) Income = 700;
+                if (job == Jobs[0])
+                {
+                    Income = 1300;
+                    if (Actions > 2) Actions = 2;
+                }
+                else if (job == Jobs[1])
+                {
+                    Income = 700;
+                    if (Actions > 5) Actions = 5;
+                }
                 else if (job == Jobs[2]) Income = 0;
             }
             Save();
