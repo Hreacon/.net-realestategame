@@ -39,6 +39,17 @@ namespace RealEstateGameTests
             Assert.Equal(2, player.TurnNum);
         }
 
+        [Fact]
+        public void PlayerCanMoveIntoApartment()
+        {
+            var player = GetPlayer();
+            player.Address = "442 Somewhere St";
+            player.Rent = 0;
+            player.LivingIn = "Home";
+            player.MoveIntoApartment();
+            Assert.Equal("Apartment", player.LivingIn);
+        }
+
         public Player GetPlayer()
         {
             var username = "test";
