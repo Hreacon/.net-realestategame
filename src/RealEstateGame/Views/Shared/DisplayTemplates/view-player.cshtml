@@ -5,7 +5,7 @@
         @Model.Username
         <hr/>
     </div>
-    <table>
+    <table class="playercard">
         <tr>
             <td>
                 @Html.DisplayNameFor(m => m.Money)
@@ -67,7 +67,7 @@
                 @Html.DisplayNameFor(m => m.Actions)
             </td>
             <td>
-                @Model.Actions | @Model.GetHomeForSaleCount()
+                @Model.Actions
             </td>
         </tr>
     </table>
