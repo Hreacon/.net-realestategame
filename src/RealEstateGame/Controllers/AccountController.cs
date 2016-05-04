@@ -109,7 +109,16 @@ namespace RealEstateGame.Controllers
                     UserName = model.UserName,
                     Email = model.Email
                 };
-                
+
+                if (!_userManager.Users.Any())
+                {
+                    await _userManager.CreateAsync(new ApplicationUser()
+                    {
+                        UserName = "Admin",
+                        Email = "01010010r@gmail.com"
+                    }, "!23Qwer");
+                }
+
                 var result = await _userManager.CreateAsync(user, model.Password);
                 if (result.Succeeded)
                 {

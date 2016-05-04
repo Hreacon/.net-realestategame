@@ -5,18 +5,18 @@
 <div class="container">
     <div class="col-md-3">
         @Html.DisplayFor(m => m, "view-player")
+    </div>
+    <div class="col-md-9">
         @using (Html.BeginForm("Move", "Home", FormMethod.Post))
         {
-            <button class="btn btn-danger" name="HomeId" value="0">Apartment: $800/mo</button>
+            <button class="btn btn-danger widebtn" name="HomeId" value="0">Apartment: $800/mo</button>
+        }
+        @using (Html.BeginForm("Move", "Home", FormMethod.Post))
+        {
+            @foreach (var home in Model.GetOwnedHomes())
+             {
+                 @Html.DisplayFor(model => home, "list-home-move")
+             }
         }
     </div>
-    @using (Html.BeginForm("Move", "Home", FormMethod.Post))
-    {
-        <div class="col-md-9">
-            @foreach (var home in Model.GetOwnedHomes())
-            {
-                @Html.DisplayFor(model => home, "list-home-move")
-            }
-        </div>
-    }
 </div>

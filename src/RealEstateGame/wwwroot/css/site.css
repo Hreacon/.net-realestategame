@@ -52,3 +52,9 @@ textarea {
 
 .list-home ul li {
 }
+
+.MainControls button, .widebtn{
+    width: 100%;
+    margin-top: 10px;
+    font-size: 1.5em;
+}
