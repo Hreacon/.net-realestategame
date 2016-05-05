@@ -98,6 +98,17 @@ namespace RealEstateGame.Controllers
         }
 
         [Authorize(Roles = "Player")]
+        public IActionResult GetPlayer(string ajax)
+        {
+            if (ajax == "true")
+            {
+                ViewBag.Player = GetPlayer();
+                return PartialView("DisplayTemplates/view-player");
+            }
+            return RedirectToAction("Index");
+        }
+
+        [Authorize(Roles = "Player")]
         public IActionResult ViewMarket(string ajax)
         {
             var player = GetPlayer();
@@ -130,31 +141,6 @@ namespace RealEstateGame.Controllers
             return RedirectToAction("Index");
         }
 
-        [Authorize(Roles = "Player")]
-        public IActionResult Move(string ajax)
-        {
-            ViewBag.Player = GetPlayer();
-            ViewData["partial"] = "MovePartial";
-            if (ajax == "true")
-            {
-                return PartialView(ViewData["partial"].ToString());
-            }
-            return View("MainPage");
-        }
-
-        // Deprecating
-        [Authorize(Roles = "Player")]
-        public IActionResult Improve(string ajax)
-        {
-            ViewBag.Player = GetPlayer();
-            ViewData["partial"] = "ImprovePartial";
-            if (ajax == "true")
-            {
-                return PartialView(ViewData["partial"].ToString());
-            }
-            return View("MainPage");
-        }
-
         // Replace move and improve with Portfolio
         [Authorize(Roles = "Player")]
         public IActionResult Portfolio(string ajax)
@@ -173,8 +159,15 @@ namespace RealEstateGame.Controllers
         public IActionResult Improve(FormCollection collection)
         {
             var player = GetPlayer();
-            player.ImproveHome(Int32.Parse(Request.Form["homeId"]));
-            return RedirectToAction("Improve");
+            var ajax = Request.Form["ajax"].ToString();
+            var id = Int32.Parse(Request.Form["homeId"].ToString());
+            player.ImproveHome(id);
+            ViewBag.Player = player;
+            if (ajax == "true")
+            {
+                return PartialView("PortfolioPartial");
+            }
+            return RedirectToAction("Portfolio");
         }
 
         [HttpPost]
@@ -183,22 +176,32 @@ namespace RealEstateGame.Controllers
         {
             int HomeId = 0;
             Int32.TryParse(Request.Form["homeId"], out HomeId);
+            ViewBag.Player = GetPlayer();
             if (HomeId > 0)
             {
-                GetPlayer().MoveIntoHome(HomeId);
+                ViewBag.Player.MoveIntoHome(HomeId);
             }
             else
             {
-                GetPlayer().MoveIntoApartment();
+                ViewBag.Player.MoveIntoApartment();
             }
-            return RedirectToAction("Index");
+            if (Request.Form["ajax"].ToString() == "true")
+            {
+                return PartialView("PortfolioPartial");
+            }
+            return RedirectToAction("Portfolio");
         }
 
         [HttpPost]
         [Authorize(Roles = "Player")]
         public IActionResult Sell(FormCollection collection)
         {
-            GetPlayer().SellHome(Int32.Parse(Request.Form["homeId"]));
+            ViewBag.Player = GetPlayer();
+            ViewBag.Player.SellHome(Int32.Parse(Request.Form["homeId"]));
+            if (Request.Form["ajax"].ToString() == "true")
+            {
+                return PartialView("PortfolioPartial");
+            }
             return RedirectToAction("Portfolio");
         }
 
@@ -217,7 +220,12 @@ namespace RealEstateGame.Controllers
         [HttpPost]
         public IActionResult ManageJobs(FormCollection collection)
         { 
-            GetPlayer().SetJob(Request.Form["newJob"]);
+            ViewBag.Player = GetPlayer();
+            ViewBag.Player.SetJob(Request.Form["newJob"]);
+            if (Request.Form["ajax"].ToString() == "true")
+            {
+                return PartialView("PortfolioPartial");
+            }
             return RedirectToAction("Index");
         }
         

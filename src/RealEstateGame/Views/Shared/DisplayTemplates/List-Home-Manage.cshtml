@@ -18,16 +18,19 @@
         {
             using (Html.BeginForm("Improve", "Home", FormMethod.Post))
             {
-               <button class="btn btn-success ajax" data-target="#rightside" name="homeId" value="@Model.HomeId">Improve</button>
+                <input type="hidden" name="homeId" value="@Model.HomeId"/>
+                <button class="btn btn-success ajax" data-target="#rightside">Improve</button>
             }
         }
         @using (Html.BeginForm("Move", "Home", FormMethod.Post))
         {
-            <button class="btn btn-default" name="homeId" value="@Model.HomeId">Move Here</button>
+            <input type="hidden" name="homeId" value="@Model.HomeId" />
+            <button class="btn btn-default ajax" data-target="#rightside">Move Here</button>
         }
         @using (Html.BeginForm("Sell", "Home", FormMethod.Post))
         {
-            <button class="btn btn-danger" name="homeId" value="@Model.HomeId">Sell This Home</button>
+            <input type="hidden" name="homeId" value="@Model.HomeId" />
+            <button class="btn btn-danger ajax" data-target="#rightside">Sell This Home</button>
         }
     </div>
 </div>
