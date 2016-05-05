@@ -1,16 +1,13 @@
 ﻿@model RealEstateGame.Models.Player
 
     <div class="MainControls">
-@using (Html.BeginForm("action", "Home", FormMethod.Post))
-{
-        @if (!Model.IsSelfEmployed())
+        @if (!ViewBag.Player.IsSelfEmployed())
         {
-            <button class="btn btn-success" name="selectedAction" value="overtime" onclick="this.form.submit()">$$ Work Overtime $$</button>
+            <a href="/Home/Action?selectedAction=overtime" data-target="#viewplayer" class="btn btn-success ajax">$$ Work Overtime $$</a>
         }
-        <button class="btn btn-default" name="selectedAction" value="moving" onclick="this.form.submit()">Move</button>
-        <button class="btn btn-default" name="selectedAction" value="improve" onclick="this.form.submit()">Improve Your Homes</button>
-        <button class="btn btn-default" name="selectedAction" value="skipturn" onclick="this.form.submit()">Next Turn</button>
-        <button class="btn btn-default" name="selectedAction" value="managejob" onclick="this.form.submit()">Manage Jobs</button>
-}
-        <a href="/Home/ViewMarket" data-target="#rightside" class="btn btn-success ajax" name="selectedAction" value="viewMarket">View Market</a>
+        <a href="/Home/Action?selectedAction=skipturn" data-target="#viewplayer" class="btn btn-default ajax">Next Turn</a>
+        <a href="/Home/Portfolio" data-target="#rightside" class="btn btn-default ajax">Improve Your Homes</a>
+        <a href="/Home/ManageJobs" data-target="#rightside" class="btn btn-default ajax">Manage Jobs</a>
+        <a href="/Home/Move" data-target="#rightside" class="btn btn-default ajax">Move</a>
+        <a href="/Home/ViewMarket" data-target="#rightside" class="btn btn-success ajax">View Market</a>
     </div>

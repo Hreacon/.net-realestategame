@@ -82,12 +82,16 @@ namespace RealEstateGame.Controllers
         
         // Routes
 
-        public IActionResult Index()
+        public IActionResult Index(string ajax)
         {
             if (User.IsSignedIn())
             {
-                ViewData["partial"] = "MainControls";
                 ViewBag.Player = GetPlayer();
+                if (ajax == "true")
+                {
+                    return PartialView("MainControls");
+                }
+                ViewData["partial"] = "MainControls";
                 return View("MainPage");
             }
             return View();
@@ -97,38 +101,25 @@ namespace RealEstateGame.Controllers
         public IActionResult ViewMarket(string ajax)
         {
             var player = GetPlayer();
-            var homes = GetHomesForSale(player.PlayerId);
+            ViewBag.Homes = GetHomesForSale(player.PlayerId);
+            ViewBag.Player = player;
             if (ajax == "true")
             {
-                return View("MarketPartial", homes);
+                return PartialView("MarketPartial");
             }
-            ViewBag.Player = player;
             ViewData["partial"] = "MarketPartial";
-            return View("MainPage", homes);
-        }
-        
-        public IActionResult About()
-        {
-            ViewData["Message"] = "Your application description page.";
-            return View();
-        }
-
-        public IActionResult Contact()
-        {
-            ViewData["Message"] = "Your contact page.";
-
-            return View();
-        }
-
-        public IActionResult Error()
-        {
-            return View();
+            return View("MainPage");
         }
 
         [Authorize(Roles = "Player")]
-        public IActionResult BuyHome(int id)
+        public IActionResult BuyHome(int id, string ajax)
         {
-            GetPlayer().BuyHome(id);
+            var player = GetPlayer(); 
+            player.BuyHome(id);
+            if (ajax == "true")
+            {
+                return PartialView("DisplayTemplates/view-player", player);
+            }
             return RedirectToAction("ViewMarket");
         }
 
@@ -140,19 +131,27 @@ namespace RealEstateGame.Controllers
         }
 
         [Authorize(Roles = "Player")]
-        public IActionResult Move()
+        public IActionResult Move(string ajax)
         {
-            var player = GetPlayer();
-            ViewBag.Homes = player.GetOwnedHomes();
-            return View(player);
+            ViewBag.Player = GetPlayer();
+            ViewData["partial"] = "MovePartial";
+            if (ajax == "true")
+            {
+                return PartialView(ViewData["partial"].ToString());
+            }
+            return View("MainPage");
         }
-
+        
         [Authorize(Roles = "Player")]
-        public IActionResult Improve()
+        public IActionResult Improve(string ajax)
         {
-            var player = GetPlayer();
-            ViewBag.Homes = player.GetOwnedHomes();
-            return View(player);
+            ViewBag.Player = GetPlayer();
+            ViewData["partial"] = "ImprovePartial";
+            if (ajax == "true")
+            {
+                return PartialView(ViewData["partial"].ToString());
+            }
+            return View("MainPage");
         }
 
         [HttpPost]
@@ -184,11 +183,13 @@ namespace RealEstateGame.Controllers
         [Authorize(Roles = "Player")]
         public IActionResult ManageJobs(string ajax)
         {
+            ViewBag.Player = GetPlayer();
+            ViewData["partial"] = "ManageJobsPartial";
             if (ajax == "true")
             {
-                return View("ManageJobsPartial", GetPlayer());
+                return PartialView(ViewData["partial"].ToString());
             }
-            return View(GetPlayer());
+            return View("MainPage");
         }
 
         [HttpPost]
@@ -197,38 +198,44 @@ namespace RealEstateGame.Controllers
             GetPlayer().SetJob(Request.Form["newJob"]);
             return RedirectToAction("Index");
         }
-
-
-        [HttpPost]
+        
         [Authorize(Roles = "Player")]
-        public IActionResult Action(string selectedAction)
+        public IActionResult Action(string selectedAction, string ajax)
         {
             var player = GetPlayer();
+            ViewBag.Player = player;
             switch (selectedAction)
             {
                 case "overtime":
                     player.WorkOvertime(_rand);
-                    break;
-                case "viewMarket":
-                    return RedirectToAction("ViewMarket");
-                    break;
-                case "moving":
-                    return RedirectToAction("Move");
-                    break;
-                case "improve":
-                    return RedirectToAction("Improve");
+                    if(ajax == "true") return PartialView("DisplayTemplates/view-player");
                     break;
                 case "skipturn":
-                    GetPlayer().SkipTurn();
-                    return RedirectToAction("Index");
-                case "managejob":
-                    return RedirectToAction("ManageJobs");
+                    player.SkipTurn();
+                    if(ajax == "true") return PartialView("DisplayTemplates/view-player");
+                    break;
                 default:
                     break;
             }
             return RedirectToAction("Index");
         }
-
         
+        public IActionResult About()
+        {
+            ViewData["Message"] = "Your application description page.";
+            return View();
+        }
+
+        public IActionResult Contact()
+        {
+            ViewData["Message"] = "Your contact page.";
+
+            return View();
+        }
+
+        public IActionResult Error()
+        {
+            return View();
+        }
     }
 }

@@ -1,7 +1,8 @@
-﻿
+﻿@Html.Partial("ReturnHome")
+
 @using (Html.BeginForm("ManageJobs", "Home", FormMethod.Post))
 {
-    foreach (var job in Model.GetPotentialJobs())
+    foreach (var job in ViewBag.Player.GetPotentialJobs())
     {
         <button name="newJob" onclick="this.form.submit()" value="@job">@job</button>
     }

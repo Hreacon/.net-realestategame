@@ -1,16 +1,8 @@
 ﻿
 
 <div class="containter">
-    <div class="col-md-6">
-        @{
-            var player = ViewBag.Player;
-        }
-        @Html.DisplayFor(m => player, "view-player")
-
-        @foreach (var home in Model.GetOwnedHomes())
-        {
-            @Html.DisplayFor(m => home, "list-home")
-        }
+    <div class="col-md-6" id="viewplayer">
+        @Html.Partial("DisplayTemplates/view-player")
     </div>
     <div class="col-md-6" id="rightside">
         @Html.Partial(ViewData["partial"].ToString())

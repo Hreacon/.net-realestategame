@@ -6,9 +6,16 @@ $(document)
             // when data returns put it in #rightside
             console.log("ajax");
             window.history.pushState('RealEstateGame', 'RealEstateGame', href);
+
+            if (href.includes("?")) {
+                href = href + "&ajax=true";
+            } else {
+                href = href + "?ajax=true";
+            }
+
             $.ajax({
                 type: 'GET',
-                url: href + '?ajax=true',
+                url: href,
                 success: function (result) {
                     $(target).html(result);
                 }

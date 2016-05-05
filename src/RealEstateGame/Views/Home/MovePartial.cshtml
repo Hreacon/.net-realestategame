@@ -1,0 +1,15 @@
+﻿@{
+    ViewData["button"] = "Move";
+}
+@Html.Partial("ReturnHome")
+@using (Html.BeginForm("Move", "Home", FormMethod.Post))
+{
+    <button class="btn btn-danger widebtn" name="HomeId" value="0">Apartment: $800/mo</button>
+}
+@using (Html.BeginForm("Move", "Home", FormMethod.Post))
+{
+    @foreach (var home in ViewBag.Player.GetOwnedHomes())
+    {
+        @Html.DisplayFor(model => home, "list-home-move")
+    }
+}
