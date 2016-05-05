@@ -1,0 +1,9 @@
+﻿
+@Html.Partial("ReturnHome")
+
+<div class="col-md-9">
+    @foreach (var home in ViewBag.Player.GetOwnedHomes())
+    {
+        @Html.DisplayFor(model => home, "list-home-manage")
+    }
+</div>

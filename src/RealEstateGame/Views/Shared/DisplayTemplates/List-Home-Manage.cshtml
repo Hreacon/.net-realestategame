@@ -1,0 +1,33 @@
+﻿@model RealEstateGame.Models.Home
+
+<div class="list-home col-sm-12">
+    <p>@Model.Address</p>
+    <hr/>
+    <div class="col-sm-7">
+        <ul>
+            <li>Value: @string.Format("{0:C0}", Model.Value)</li>
+            <li>Asking: @string.Format("{0:C0}", Model.Asking)</li>
+            <li>Condition: @Model.Condition</li>
+            @if(Model.Condition < 10) {
+                <li>Cost to Improve: @string.Format("{0:C}", Model.GetCostImprovement())</li>
+            }
+        </ul>
+    </div>
+    <div class="col-sm-5">
+        @if (Model.Condition < 10)
+        {
+            using (Html.BeginForm("Improve", "Home", FormMethod.Post))
+            {
+               <button class="btn btn-success ajax" data-target="#rightside" name="homeId" value="@Model.HomeId">Improve</button>
+            }
+        }
+        @using (Html.BeginForm("Move", "Home", FormMethod.Post))
+        {
+            <button class="btn btn-default" name="homeId" value="@Model.HomeId">Move Here</button>
+        }
+        @using (Html.BeginForm("Sell", "Home", FormMethod.Post))
+        {
+            <button class="btn btn-danger" name="homeId" value="@Model.HomeId">Sell This Home</button>
+        }
+    </div>
+</div>

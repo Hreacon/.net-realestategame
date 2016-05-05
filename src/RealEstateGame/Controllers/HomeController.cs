@@ -141,12 +141,26 @@ namespace RealEstateGame.Controllers
             }
             return View("MainPage");
         }
-        
+
+        // Deprecating
         [Authorize(Roles = "Player")]
         public IActionResult Improve(string ajax)
         {
             ViewBag.Player = GetPlayer();
             ViewData["partial"] = "ImprovePartial";
+            if (ajax == "true")
+            {
+                return PartialView(ViewData["partial"].ToString());
+            }
+            return View("MainPage");
+        }
+
+        // Replace move and improve with Portfolio
+        [Authorize(Roles = "Player")]
+        public IActionResult Portfolio(string ajax)
+        {
+            ViewBag.Player = GetPlayer();
+            ViewData["partial"] = "PortfolioPartial";
             if (ajax == "true")
             {
                 return PartialView(ViewData["partial"].ToString());
@@ -178,6 +192,14 @@ namespace RealEstateGame.Controllers
                 GetPlayer().MoveIntoApartment();
             }
             return RedirectToAction("Index");
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "Player")]
+        public IActionResult Sell(FormCollection collection)
+        {
+            GetPlayer().SellHome(Int32.Parse(Request.Form["homeId"]));
+            return RedirectToAction("Portfolio");
         }
 
         [Authorize(Roles = "Player")]
