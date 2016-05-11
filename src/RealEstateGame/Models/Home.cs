@@ -108,6 +108,25 @@ namespace RealEstateGame.Models
             }
         }
 
+        public double CostToCondition(int target)
+        {
+            if (Condition < target)
+            {
+                double cost = 0;
+                double lastCost = 0;
+                double val = Value;
+                for (int i = Condition; i < target; i++)
+                {
+                    lastCost = GetCostImprovement();
+                    Value = Value + lastCost;
+                    cost += lastCost;
+                }
+                Value = val;
+                return cost;
+            }
+            return 0;
+        }
+
         public void Degrade(Random rand = null)
         {
             if (Condition > 0)
