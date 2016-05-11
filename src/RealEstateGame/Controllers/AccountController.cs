@@ -5,6 +5,7 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Authorization;
 using Microsoft.AspNet.Identity;
+using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.AspNet.Mvc;
 using Microsoft.AspNet.Mvc.Rendering;
 using Microsoft.Data.Entity;
@@ -23,14 +24,17 @@ namespace RealEstateGame.Controllers
         private readonly IEmailSender _emailSender;
         private readonly ISmsSender _smsSender;
         private readonly ILogger _logger;
+        private ApplicationDbContext _context;
 
         public AccountController(
+            ApplicationDbContext context,
             UserManager<ApplicationUser> userManager,
             SignInManager<ApplicationUser> signInManager,
             IEmailSender emailSender,
             ISmsSender smsSender,
             ILoggerFactory loggerFactory)
         {
+            _context = context;
             _userManager = userManager;
             _signInManager = signInManager;
             _emailSender = emailSender;
@@ -112,17 +116,26 @@ namespace RealEstateGame.Controllers
 
                 if (!_userManager.Users.Any())
                 {
-                    await _userManager.CreateAsync(new ApplicationUser()
+                    // there are no users. There are no user roles.
+                    _context.Roles.Add(new IdentityRole("Admin"));
+                    _context.Roles.Add(new IdentityRole("Player"));
+                    _context.SaveChanges();
+                    var admin = new ApplicationUser()
                     {
                         UserName = "Admin",
                         Email = "01010010r@gmail.com"
-                    }, "!23Qwer");
+                    };
+                    await _userManager.CreateAsync(admin, "!23Qwer");
+                    await _userManager.AddToRoleAsync(admin, "Admin");
+                    await _userManager.AddToRoleAsync(admin, "Player");
                     // TODO add role to this user for admin privaledges
                 }
 
                 var result = await _userManager.CreateAsync(user, model.Password);
                 if (result.Succeeded)
                 {
+                    // Add user to player role
+                    await _userManager.AddToRoleAsync(user, "Player");
                     // For more information on how to enable account confirmation and password reset please visit http://go.microsoft.com/fwlink/?LinkID=532713
                     // Send an email with this link
                     //var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
