@@ -88,5 +88,11 @@ function ajaxInit() {
 $(document)
     .ready(function () {
         ajaxInit();
+        var $window = $(window);
+        var player = $("#viewplayer");
+        $window.scroll(function () {
+            console.log("Scroll", window.pageYOffset);
+            player.css('margin-top', window.pageYOffset);
+        });
     });
 
