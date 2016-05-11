@@ -55,3 +55,31 @@ textarea {
     margin-top: 10px;
     font-size: 1.5em;
 }
+
+.playername {
+    text-align: center;
+    font-weight: bold;
+    font-size: 1.5em;
+    padding-top: 25px;
+}
+
+.playertitle {
+    display: inline-block;
+    width: 29%;
+    margin-left: 5%;
+
+}
+.playervalue {
+    display: inline-block;
+    width: 55%; 
+
+}
+.playertitle, .playervalue {
+    border-bottom: lightgray 1px solid;
+}
+.playercard {
+    border: 1px solid black;
+    border-radius: 10px;
+    padding: 10px;
+    margin: 10px;
+}

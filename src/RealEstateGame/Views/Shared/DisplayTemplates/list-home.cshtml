@@ -13,11 +13,11 @@
     <div class="col-sm-5">
         @if (Model.Owned == 0 && Model.ForSale == 1)
         {
-            <a href="/home/buyhome/@Model.HomeId" class="btn btn-success">Buy This Home</a>
-        }
-        else
-        {
-            <a href="/home/sellhome/@Model.HomeId" class="btn btn-danger">Sell This Home</a>
+            using (Html.BeginForm("Buy", "Home", FormMethod.Post))
+            {
+                <input type="hidden" name="homeId" value="@Model.HomeId"/>
+                <button class="btn btn-success ajax" data-target="#rightside">But This Home</button>
+            }
         }
     </div>
 </div>

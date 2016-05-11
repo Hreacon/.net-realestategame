@@ -8,7 +8,7 @@
 }
 @using (Html.BeginForm("Move", "Home", FormMethod.Post))
 {
-    @foreach (var home in ViewBag.Player.GetOwnedHomes())
+    foreach (var home in ViewBag.Player.GetOwnedHomes())
     {
         @Html.DisplayFor(model => home, "list-home-move")
     }

@@ -122,14 +122,22 @@ namespace RealEstateGame.Controllers
             return View("MainPage");
         }
 
+        [HttpPost]
         [Authorize(Roles = "Player")]
-        public IActionResult BuyHome(int id, string ajax)
+        public IActionResult Buy(FormCollection collection)
         {
-            var player = GetPlayer(); 
-            player.BuyHome(id);
-            if (ajax == "true")
+            var id = 0;
+            Int32.TryParse(Request.Form["homeId"], out id);
+            if (id > 0)
             {
-                return PartialView("DisplayTemplates/view-player", player);
+                var ajax = Request.Form["ajax"].ToString();
+                var player = GetPlayer(); 
+                player.BuyHome(id);
+                ViewBag.Homes = GetHomesForSale(player.PlayerId);
+                if (ajax == "true")
+                {
+                    return PartialView("MarketPartial");
+                }
             }
             return RedirectToAction("ViewMarket");
         }
@@ -224,7 +232,7 @@ namespace RealEstateGame.Controllers
             ViewBag.Player.SetJob(Request.Form["newJob"]);
             if (Request.Form["ajax"].ToString() == "true")
             {
-                return PartialView("PortfolioPartial");
+                return PartialView("MainControls");
             }
             return RedirectToAction("Index");
         }

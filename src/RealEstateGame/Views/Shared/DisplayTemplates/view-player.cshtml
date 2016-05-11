@@ -2,75 +2,17 @@
     var Player = ViewBag.Player as Player;
 }
 
-<div>
-    <div>
+<div class="playercard">
+    <div class="playername">
         @Player.Username
         <hr/>
     </div>
-    <table class="playercard">
-        <tr>
-            <td>
-                @Html.DisplayNameFor(m => Player.Money)
-            </td>
-            <td>
-                @string.Format("{0:C}", Player.Money)
-            </td>
-        </tr>
-        <tr>
-            <td>
-                @Html.DisplayNameFor(m => Player.Income)
-            </td>
-            <td>
-                @string.Format("{0:C}", Player.Income)
-            </td>
-        </tr>
-        <tr>
-            <td>
-                @Html.DisplayNameFor(m => Player.Job)
-            </td>
-            <td>
-                @Player.Job
-            </td>
-        </tr>
-        <tr>
-            <td>
-                @Html.DisplayNameFor(m => Player.LivingIn)
-            </td>
-            <td>
-                @Player.LivingIn
-            </td>
-        </tr>
-        <tr>
-            <td>
-                @Html.DisplayNameFor(m => Player.Address)
-            </td>
-            <td>
-                @Player.Address
-            </td>
-        </tr>
-        <tr>
-            <td>
-                @Html.DisplayNameFor(m => Player.Rent)
-            </td>
-            <td>
-                @string.Format("{0:C}", Player.Rent)
-            </td>
-        </tr>
-        <tr>
-            <td>
-                @Html.DisplayNameFor(m => Player.TurnNum)
-            </td>
-            <td>
-                @Player.TurnNum
-            </td>
-        </tr>
-        <tr>
-            <td>
-                @Html.DisplayNameFor(m => Player.Actions)
-            </td>
-            <td>
-                @Player.Actions
-            </td>
-        </tr>
-    </table>
-</div>
+    <div class="playertitle">@Html.DisplayNameFor(m => Player.Money)</div><div class="playervalue">@string.Format("{0:C}", Player.Money)</div>
+    <div class="playertitle">@Html.DisplayNameFor(m => Player.Income)</div><div class="playervalue">@string.Format("{0:C}", Player.Income)</div>
+    <div class="playertitle">@Html.DisplayNameFor(m => Player.Job)</div><div class="playervalue">@Player.Job</div>
+    <div class="playertitle">@Html.DisplayNameFor(m => Player.LivingIn)</div><div class="playervalue">@Player.LivingIn</div>
+    <div class="playertitle">@Html.DisplayNameFor(m => Player.Address)</div><div class="playervalue">@Player.Address</div>
+    <div class="playertitle">@Html.DisplayNameFor(m => Player.Rent)</div><div class="playervalue">@string.Format("{0:C}", Player.Rent)</div>
+    <div class="playertitle">@Html.DisplayNameFor(m => Player.TurnNum)</div><div class="playervalue">@Player.TurnNum</div>
+    <div class="playertitle">@Html.DisplayNameFor(m => Player.Actions)</div><div class="playervalue">@Player.Actions</div>
+      </div>

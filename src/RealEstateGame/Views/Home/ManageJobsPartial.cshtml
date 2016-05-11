@@ -1,9 +1,10 @@
 ﻿@Html.Partial("ReturnHome")
 
-@using (Html.BeginForm("ManageJobs", "Home", FormMethod.Post))
+@foreach (var job in ViewBag.Player.GetPotentialJobs())
 {
-    foreach (var job in ViewBag.Player.GetPotentialJobs())
+    using (Html.BeginForm("ManageJobs", "Home", FormMethod.Post))
     {
-        <button name="newJob" onclick="this.form.submit()" value="@job">@job</button>
+        <input type="hidden" name="newJob" value="@job"/>
+        <button class="btn widebtn ajax" data-target="#rightside">@job</button>
     }
 }

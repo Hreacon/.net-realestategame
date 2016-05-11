@@ -1,9 +1,15 @@
 ﻿
 @Html.Partial("ReturnHome")
 
-<div class="col-md-9">
-    @foreach (var home in ViewBag.Player.GetOwnedHomes())
+@if (ViewBag.Player.LivingIn != "Apartment")
+{
+    using (Html.BeginForm("Move", "Home", FormMethod.Post))
     {
-        @Html.DisplayFor(model => home, "list-home-manage")
+        <button class="btn btn-danger widebtn" name="HomeId" value="0">Apartment: $800/mo</button>
     }
-</div>
+}
+
+@foreach (var home in ViewBag.Player.GetOwnedHomes())
+{
+    @Html.DisplayFor(model => home, "list-home-manage")
+}
