@@ -1,18 +1,18 @@
 ﻿@{
-    var Player = ViewBag.Player as Player;
+    var player = ViewBag.Player as Player;
 }
 
 <div class="playercard">
     <div class="playername">
-        @Player.Username
+        @player.Username
         <hr/>
     </div>
-    <div class="playertitle">@Html.DisplayNameFor(m => Player.Money)</div><div class="playervalue">@string.Format("{0:C}", Player.Money)</div>
-    <div class="playertitle">@Html.DisplayNameFor(m => Player.Income)</div><div class="playervalue">@string.Format("{0:C}", Player.Income)</div>
-    <div class="playertitle">@Html.DisplayNameFor(m => Player.Job)</div><div class="playervalue">@Player.Job</div>
-    <div class="playertitle">@Html.DisplayNameFor(m => Player.LivingIn)</div><div class="playervalue">@Player.LivingIn</div>
-    <div class="playertitle">@Html.DisplayNameFor(m => Player.Address)</div><div class="playervalue">@Player.Address</div>
-    <div class="playertitle">@Html.DisplayNameFor(m => Player.Rent)</div><div class="playervalue">@string.Format("{0:C}", Player.Rent)</div>
-    <div class="playertitle">@Html.DisplayNameFor(m => Player.TurnNum)</div><div class="playervalue">@Player.TurnNum</div>
-    <div class="playertitle">@Html.DisplayNameFor(m => Player.Actions)</div><div class="playervalue">@Player.Actions</div>
-      </div>
+    <div class="playertitle">@Html.DisplayNameFor(m => player.Money)</div><div class="playervalue">@string.Format("{0:C}", player.Money)</div>
+    <div class="playertitle">@Html.DisplayNameFor(m => player.Income)</div><div class="playervalue">@string.Format("{0:C}", player.Income)</div>
+    <div class="playertitle">@Html.DisplayNameFor(m => player.Job)</div><div class="playervalue">@player.Job</div>
+    <div class="playertitle">@Html.DisplayNameFor(m => player.LivingIn)</div><div class="playervalue">@player.LivingIn</div>
+    <div class="playertitle">@Html.DisplayNameFor(m => player.Address)</div><div class="playervalue">@player.Address</div>
+    <div class="playertitle">@Html.DisplayNameFor(m => player.Rent)</div><div class="playervalue">@string.Format("{0:C}", player.Rent)</div>
+    <div class="playertitle">@Html.DisplayNameFor(m => player.TurnNum)</div><div class="playervalue">@player.TurnNum</div>
+    <div class="playertitle">@Html.DisplayNameFor(m => player.Actions)</div><div class="playervalue">@player.Actions</div>
+</div>

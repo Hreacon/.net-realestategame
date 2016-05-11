@@ -83,3 +83,16 @@ textarea {
     padding: 10px;
     margin: 10px;
 }
+
+.message {
+    text-align: center;
+    font-weight: bold;
+    font-size: 2em;
+    position: fixed;
+    top: 50px;
+    left: 0px;
+    z-index: 100;
+    background: lightslategray;
+    width: 100%;
+    display: none;
+}

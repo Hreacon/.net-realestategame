@@ -1,4 +1,6 @@
-﻿@model RealEstateGame.Models.Home
+﻿
+
+@model RealEstateGame.Models.Home
 
 <div class="list-home col-sm-12">
     <p>@Model.Address</p>
@@ -16,7 +18,7 @@
             using (Html.BeginForm("Buy", "Home", FormMethod.Post))
             {
                 <input type="hidden" name="homeId" value="@Model.HomeId"/>
-                <button class="btn btn-success ajax" data-target="#rightside">But This Home</button>
+                <button class="btn btn-success ajax" data-target="#rightside">Buy This Home</button>
             }
         }
     </div>
