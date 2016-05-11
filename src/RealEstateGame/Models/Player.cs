@@ -208,6 +208,11 @@ namespace RealEstateGame.Models
             };
         }
 
+        public void addTransaction(Transaction sale)
+        {
+            context.Transactions.Add(sale);
+        }
+
         public bool BuyHome(int id)
         {
             var home = GetHome(id);
@@ -216,6 +221,7 @@ namespace RealEstateGame.Models
                 Money = Money - home.Asking;
                 home.Owned = 1;
                 home.ForSale = 0;
+                addTransaction(new Transaction(PlayerId, home.HomeId, TurnNum, home.Asking));
                 SavePlayerAndHome(home);
                 return true;
             }
@@ -237,6 +243,7 @@ namespace RealEstateGame.Models
                 home.ForSale = 1;
                 home.Asking = home.Value + home.Value/10;
                 // TODO make this more realistic
+                addTransaction(new Transaction(PlayerId, home.HomeId, TurnNum, home.Value));
                 SavePlayerAndHome(home);
             }
         }

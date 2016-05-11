@@ -20,5 +20,6 @@ namespace RealEstateGame.Models
         public DbSet<Player> Players { get; set; }
         public DbSet<Home> Homes { get; set; }
         public DbSet<Loan> Loans { get; set; }
+        public DbSet<Transaction> Transactions { get; set; }
     }
 }
