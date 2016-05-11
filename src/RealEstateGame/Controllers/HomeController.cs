@@ -15,8 +15,8 @@ namespace RealEstateGame.Controllers
     public class HomeController : Controller
     {
         private readonly UserManager<ApplicationUser> _userManager;
-        private ApplicationDbContext _context;
-        private Random _rand;
+        private readonly ApplicationDbContext _context;
+        private readonly Random _rand;
 
         public HomeController(ApplicationDbContext context, UserManager<ApplicationUser> userManager)
         {
@@ -67,19 +67,21 @@ namespace RealEstateGame.Controllers
         [Authorize(Roles = "Player")]
         private IEnumerable<Home> GetHomesForSale(int playerId)
         {
-            if (_context.Homes.Any())
+            while (true)
             {
-                IEnumerable<Home> homes = _context.Homes.Where(m => m.PlayerId == playerId && m.Owned == 0 && m.ForSale == 1).OrderBy(m=>m.Asking);
-                if (homes.Count() > 0)
+                if (_context.Homes.Any())
                 {
-                    return homes;
+                    IEnumerable<Home> homes = _context.Homes.Where(m => m.PlayerId == playerId && m.Owned == 0 && m.ForSale == 1).OrderBy(m => m.Asking);
+                    if (homes.Any())
+                    {
+                        return homes;
+                    }
                 }
+                _context.Homes.AddRange(Home.GenerateHomes(playerId));
+                _context.SaveChanges();
             }
-            _context.Homes.AddRange(Home.GenerateHomes(playerId));
-            _context.SaveChanges();
-            return GetHomesForSale(playerId);
         }
-        
+
         // Routes
 
         public IActionResult Index(string ajax)
@@ -132,11 +134,18 @@ namespace RealEstateGame.Controllers
             {
                 var ajax = Request.Form["ajax"].ToString();
                 var player = GetPlayer(); 
-                player.BuyHome(id);
-                ViewBag.Homes = GetHomesForSale(player.PlayerId);
-                if (ajax == "true")
+                var success = player.BuyHome(id);
+                if (success)
                 {
-                    return PartialView("MarketPartial");
+                    ViewBag.Homes = GetHomesForSale(player.PlayerId);
+                    if (ajax == "true")
+                    {
+                        return PartialView("MarketPartial");
+                    }
+                }
+                else
+                {
+                    return Content("You Can't Afford This Home");
                 }
             }
             return RedirectToAction("ViewMarket");
@@ -169,13 +178,17 @@ namespace RealEstateGame.Controllers
             var player = GetPlayer();
             var ajax = Request.Form["ajax"].ToString();
             var id = Int32.Parse(Request.Form["homeId"].ToString());
-            player.ImproveHome(id);
-            ViewBag.Player = player;
-            if (ajax == "true")
+            var success = player.ImproveHome(id);
+            if (success)
             {
-                return PartialView("PortfolioPartial");
+                ViewBag.Player = player;
+                if (ajax == "true")
+                {
+                    return PartialView("PortfolioPartial");
+                }
+                return RedirectToAction("Portfolio");
             }
-            return RedirectToAction("Portfolio");
+            return Content("You can't afford to improve this home...");
         }
 
         [HttpPost]
