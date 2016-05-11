@@ -19,9 +19,6 @@
         }
     });
 }
-function response(result) {
-    console.log(result);
-}
 function ajaxPost(form, target) {
     // ajax post requests
     // get the href
@@ -34,9 +31,11 @@ function ajaxPost(form, target) {
         data: $(form).serialize(),
         success: function (result) {
             console.log("post success");
-            $(target).html(result);
-            updatePlayer();
-            ajaxInit();
+            if (result.trim().substr(0, 1) == "<") {
+                $(target).html(result);
+                updatePlayer();
+                ajaxInit();
+            } else message(result);
         }
     });
 }
@@ -50,6 +49,16 @@ function updatePlayer() {
             $("#viewplayer").html(result);
         }
     });
+}
+function message(text) {
+    console.log("message '" + text+"'");
+    var message = $(".message");
+    message.text(text);
+    message.fadeIn();
+    window.setTimeout(function() {
+            message.fadeOut();
+        },
+        1500);
 }
 function ajaxInit() {
     // initialize the ajax calls in place of the standard event handling
