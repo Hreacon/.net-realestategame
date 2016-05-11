@@ -63,7 +63,7 @@ namespace RealEstateGame.Models
             UseAction();
         }
 
-        public void ImproveHome(int id)
+        public bool ImproveHome(int id)
         {
             var home = GetHome(id);
             if (home.Owned == 1 && home.GetCostImprovement() <= Money)
@@ -72,7 +72,9 @@ namespace RealEstateGame.Models
                 Money = Money - home.GetCostImprovement();
                 home.Improve();
                 SavePlayerAndHome(home);
+                return true;
             }
+            return false;
         }
 
         // Player has used an action point.
@@ -206,7 +208,7 @@ namespace RealEstateGame.Models
             };
         }
 
-        public void BuyHome(int id)
+        public bool BuyHome(int id)
         {
             var home = GetHome(id);
             if (home.Asking < Money)
@@ -215,7 +217,9 @@ namespace RealEstateGame.Models
                 home.Owned = 1;
                 home.ForSale = 0;
                 SavePlayerAndHome(home);
+                return true;
             }
+            return false;
         }
 
         public void SellHome(int id)
