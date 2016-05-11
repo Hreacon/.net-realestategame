@@ -100,8 +100,7 @@ namespace RealEstateGame.Models
                 {
                     rand = new Random();
                 }
-                double random = rand.Next(0, 20) - 10;
-                if (random < -3) random += 3;
+                double random = rand.Next(0, 10);
                 double variance = 1 + random/100;
                 double multi = (1 + (Condition * (variance) / 100));
                 Value = Value*multi;
