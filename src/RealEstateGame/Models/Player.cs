@@ -248,48 +248,45 @@ namespace RealEstateGame.Models
             return false;
         }
 
-        public void SellHome(int id)
+        public bool SellHome(int id)
         {
             var home = GetHome(id);
-            if (home.Owned == 1)
+            if (home.Owned == 0) return false;
+            bool cansell = true;
+            Loan loan = null;
+            // check to see if home has loan
+            var loans = GetLoans();
+            if (loans != null)
             {
-                bool cansell = true;
-                Loan loan = null;
-                // check to see if home has loan
-                var loans = GetLoans();
-                if (loans != null)
+                foreach (var loanitem in loans)
                 {
-                    foreach (var loanitem in loans)
+                    if (loanitem.HomeId == home.HomeId)
                     {
-                        if (loanitem.HomeId == home.HomeId)
-                        {
-                            // home has a loan.
-                            if (loanitem.Principal > home.Value) cansell = false;
-                            else loan = loanitem;
-                        }
+                        // home has a loan.
+                        if (loanitem.Principal > home.Value || loanitem.LoanType == 1 && TurnNum - loanitem.StartTurnNum < 12) cansell = false;
+                        else loan = loanitem;
                     }
-                }
-                if (cansell)
-                {
-                    if (Address == home.Address)
-                    {
-                        // player lives in house, they sell the home they move into an apartment
-                        MoveIntoApartment();
-                    }
-                    Money = Money + home.Value;
-                    if (loan != null)
-                    {
-                        Money = Money - loan.Principal;
-                        context.Remove(loan);
-                    }
-                    home.Owned = 0;
-                    home.ForSale = 1;
-                    home.Asking = home.Value + home.Value/10;
-                    // TODO make this more realistic
-                    addTransaction(new Transaction(PlayerId, home.HomeId, TurnNum, home.Value));
-                    SavePlayerAndHome(home);
                 }
             }
+            if (!cansell) return false;
+            if (Address == home.Address)
+            {
+                // player lives in house, they sell the home they move into an apartment
+                MoveIntoApartment();
+            }
+            Money = Money + home.Value;
+            if (loan != null)
+            {
+                Money = Money - loan.Principal;
+                context.Remove(loan);
+            }
+            home.Owned = 0;
+            home.ForSale = 1;
+            home.Asking = home.Value + home.Value/10;
+            // TODO make this more realistic
+            addTransaction(new Transaction(PlayerId, home.HomeId, TurnNum, home.Value));
+            SavePlayerAndHome(home);
+            return true;
         }
 
         public void SavePlayerAndHome(Home home)
@@ -350,21 +347,39 @@ namespace RealEstateGame.Models
             return output;
         }
 
-        public void MoveIntoApartment()
+        public bool MoveIntoApartment()
         {
-            LivingIn = "Apartment";
-            Address = "123 Example St";
-            Rent = 800;
-            Save();
+            return Move("Apartment", "123 Example St", 800);
         }
 
-        public void MoveIntoHome(int id)
+        public bool MoveIntoHome(int id)
         {
-            var home = GetHome(id);
-            LivingIn = "Owned Home";
-            Address = home.Address;
-            Rent = 0;
-            SavePlayerAndHome(home);
+            return MoveIntoHome(GetHome(id));
+        }
+
+        public bool MoveIntoHome(Home home)
+        {
+            return Move("Owned Home", home.Address, 0);
+        }
+
+        private bool Move(string livingin, string address, int rent)
+        {
+            var loans = GetLoans();
+            if (loans != null)
+            {
+                foreach (var loan in loans)
+                {
+                    if (loan.LoanType == 1)
+                    {
+                        if (TurnNum - loan.StartTurnNum < 12) return false;
+                    }
+                }
+            }
+            LivingIn = livingin;
+            Address = address;
+            Rent = rent;
+            Save();
+            return true;
         }
 
         public IEnumerable<Home> GetOwnedHomes()
