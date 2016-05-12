@@ -104,13 +104,39 @@ namespace RealEstateGame.Controllers
                     // player can afford loan
                     player.Money = player.Money - home.Asking*.2;
                     home.Owned = 1;
-                    _context.Loans.Add(new Loan(player.PlayerId, home.Asking - (home.Asking*.2), GetAPR(), 360,
+                    _context.Loans.Add(new Loan(player.PlayerId, home.Asking - home.GetDownPayment(), GetAPR(), 360,
                         player.TurnNum, home));
                     player.SavePlayerAndHome(home);
-                    return RedirectToAction("Index", "Home");
+                    return RedirectToAction("Index", "Home", new {ajax=ajax});
                 }
             }
-            return RedirectToAction("Index", "Home");
+            // something went wrong
+            return RedirectToAction("Application", new {ajax=ajax});
+        }
+
+        [HttpPost]
+        public IActionResult FhaLoanApplication(FormCollection col, string ajax)
+        {
+            var player = GetPlayer();
+            int homeId = 0;
+            int.TryParse(Request.Form["homeId"], out homeId);
+            if (homeId > 0)
+            {
+                var home = _context.Homes.FirstOrDefault(m => m.HomeId == homeId);
+                var totalCost = home.GetFHADownPayment();
+                if (home.Condition < 7) totalCost += home.CostToCondition(Loan.FHACondition);
+                if (player.Money > totalCost)
+                {
+                    player.Money = player.Money - totalCost;
+                    if(home.Condition < 7 ) home.ImproveToCondition(Loan.FHACondition);
+                    home.Owned = 1;
+                    _context.Loans.Add(new Loan(player.PlayerId, home.Asking - home.GetFHADownPayment(), GetAPR(), 360,
+                        player.TurnNum, home, 1));
+                    player.SavePlayerAndHome(home);
+                    return RedirectToAction("Index", "Home", new {ajax=ajax});
+                }
+            }
+            return RedirectToAction("Application", new {ajax = ajax});
         }
 
         [HttpPost]
@@ -119,26 +145,29 @@ namespace RealEstateGame.Controllers
             // todo ajax
             var player = GetPlayer();
             var loans = player.GetLoans();
-            foreach (var loan in loans)
+            if (loans != null)
             {
-                var extrapayment = Double.Parse(Request.Form[loan.LoanId.ToString()]);
-                if (player.Money > extrapayment && extrapayment > 0)
+                foreach (var loan in loans)
                 {
-                    if (extrapayment > loan.Principal)
+                    var extrapayment = Double.Parse(Request.Form[loan.LoanId.ToString()]);
+                    if (player.Money > extrapayment && extrapayment > 0)
                     {
-                        extrapayment = loan.Principal;
+                        if (extrapayment > loan.Principal)
+                        {
+                            extrapayment = loan.Principal;
+                        }
+                        loan.MakeExtraPayment(extrapayment);
+                        if (loan.Principal <= 0)
+                        {
+                            _context.Loans.Remove(loan);
+                        }
+                        player.Money = player.Money - extrapayment;
+                        _context.Loans.Update(loan);
                     }
-                    loan.MakeExtraPayment(extrapayment);
-                    if (loan.Principal <= 0)
-                    {
-                        _context.Loans.Remove(loan);
-                    }
-                    player.Money = player.Money - extrapayment;
-                    _context.Loans.Update(loan);
                 }
+                player.Save();
             }
-            player.Save();
-            return RedirectToAction("Index");
+            return RedirectToAction("Index", new {ajax=ajax});
         }
     }
 }

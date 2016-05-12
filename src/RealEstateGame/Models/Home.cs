@@ -127,6 +127,25 @@ namespace RealEstateGame.Models
             return 0;
         }
 
+        public void ImproveToCondition(int target)
+        {
+            Random rand = new Random();
+            while (Condition < target)
+            {
+                Improve(rand);
+            }
+        }
+
+        public double GetDownPayment()
+        {
+            return Asking*.2;
+        }
+
+        public double GetFHADownPayment()
+        {
+            return Asking*.035;
+        }
+
         public void Degrade(Random rand = null)
         {
             if (Condition > 0)

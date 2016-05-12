@@ -3,8 +3,8 @@
 *@
 @{
     var home = ViewBag.Home as Home;
-    var regular = home.Asking*.2;
-    var fha = home.Asking*.035;
+    var regular = home.GetDownPayment();
+    var fha = home.GetFHADownPayment();
     var apr = double.Parse(ViewData["apr"].ToString());
 }
 @Html.Partial("ReturnHome")
@@ -24,10 +24,10 @@
 <div class="playervalue">@home.Condition</div>
 <div class="playertitle">Term:</div>
 <div class="playervalue">30 Year</div>
-@if (home.Condition < 7)
+@if (home.Condition < Loan.FHACondition)
 {
     <div class="playertitle">Cost to Improve to 7:</div>
-    <div class="playervalue">@string.Format("{0:C}", home.CostToCondition(7))</div>
+    <div class="playervalue">@string.Format("{0:C}", home.CostToCondition(Loan.FHACondition))</div>
 }
 <div>
     <p>Regular Mortgage</p>
@@ -47,4 +47,14 @@
     <div class="playervalue">@string.Format("{0:C}", fha)</div>
     <div class="playertitle">FHA Mortgage Payment:</div>
     <div class="playervalue">@string.Format("{0:C}", Loan.CalculatePayment(home.Asking - fha, apr + .03, 360))</div>
+    @if (home.Condition < Loan.FHACondition)
+    {
+        <div class="playertitle">FHA Mortgage Total Down</div>
+        <div class="playervalue">@string.Format("{0:C}", fha+home.CostToCondition(Loan.FHACondition))</div>
+    }
+    @using (Html.BeginForm("FHALoanApplication", "Loan", FormMethod.Post))
+    {
+        <input type="hidden" name="homeId" value="@home.HomeId" />
+        <button>Apply For Loan</button>
+    }
 </div>

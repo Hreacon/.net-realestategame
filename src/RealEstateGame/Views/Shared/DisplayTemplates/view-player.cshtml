@@ -1,5 +1,6 @@
 ﻿@{
     var player = ViewBag.Player as Player;
+    var loans = player.GetLoans();
 }
 
 <div class="playercard">
@@ -23,12 +24,15 @@
         <div class="loancol3">Payment</div>
         <div class="loancol4">Term</div>
     </div>
-    @foreach (var loan in @player.GetLoans())
+    @if (loans != null)
     {
-        <div class="loan">
-            <div class="loancol2">@string.Format("{0:C}", loan.Principal)</div>
-            <div class="loancol3">@string.Format("{0:C}", loan.Payment)</div>
-            <div class="loancol4">@loan.PaymentsLeft</div>
-        </div>
+        foreach (var loan in loans)
+        {
+            <div class="loan">
+                <div class="loancol2">@string.Format("{0:C}", loan.Principal)</div>
+                <div class="loancol3">@string.Format("{0:C}", loan.Payment)</div>
+                <div class="loancol4">@loan.PaymentsLeft</div>
+            </div>
+        }
     }
 </div>

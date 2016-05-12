@@ -1,7 +1,7 @@
 ﻿@model RealEstateGame.Models.Home
 @{
-    var regular = Model.Asking*.2;
-    var fha = Model.Asking*.035;
+    var regular = Model.GetDownPayment();
+    var fha = Model.GetFHADownPayment();
 }
 <div class="list-home col-sm-12">
     <p>@Model.Address</p>

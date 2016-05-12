@@ -20,8 +20,11 @@ namespace RealEstateGame.Models
         public double Payment { get; set; }
         public int StartTurnNum { get; set; }
         public int PaymentsLeft { get; set; }
+        public int LoanType { get; set; } // 0 for regular, 1 for fha
 
-        public Loan(int playerId, double principal, double apr, int term, int startTurnNum, Home inhome)
+        [NotMapped] public static int FHACondition = 7;
+
+        public Loan(int playerId, double principal, double apr, int term, int startTurnNum, Home inhome, int loanType = 0)
         {
             PlayerId = playerId;
             Principal = principal;
@@ -29,9 +32,11 @@ namespace RealEstateGame.Models
             Term = term;
             StartTurnNum = startTurnNum;
             HomeId = inhome.HomeId;
+            LoanType = loanType; // default regular
 
             Payment = Loan.CalculatePayment(principal, apr, term);
             PaymentsLeft = term;
+
         }
 
         public Loan()

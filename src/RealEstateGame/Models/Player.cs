@@ -110,17 +110,20 @@ namespace RealEstateGame.Models
 
                 // pay loans
                 var loans = GetLoans();
-                foreach (var loan in loans)
+                if (loans != null)
                 {
-                    if (Money > loan.Payment)
+                    foreach (var loan in loans)
                     {
-                        if (loan.Payment > loan.Principal) loan.Payment = loan.Principal+10;
-                        loan.MakePayment();
-                        Money = Money - loan.Payment;
-                        if (loan.Principal <= 0) context.Loans.Remove(loan);
-                        else context.Loans.Update(loan);
+                        if (Money > loan.Payment)
+                        {
+                            if (loan.Payment > loan.Principal) loan.Payment = loan.Principal+10;
+                            loan.MakePayment();
+                            Money = Money - loan.Payment;
+                            if (loan.Principal <= 0) context.Loans.Remove(loan);
+                            else context.Loans.Update(loan);
+                        }
+                        // TODO else they lose?
                     }
-                    // TODO else they lose?
                 }
 
                 // randomly houses change for sale status
@@ -254,13 +257,16 @@ namespace RealEstateGame.Models
                 Loan loan = null;
                 // check to see if home has loan
                 var loans = GetLoans();
-                foreach (var loanitem in loans)
+                if (loans != null)
                 {
-                    if (loanitem.HomeId == home.HomeId)
+                    foreach (var loanitem in loans)
                     {
-                        // home has a loan.
-                        if (loanitem.Principal > home.Value) cansell = false;
-                        else loan = loanitem;
+                        if (loanitem.HomeId == home.HomeId)
+                        {
+                            // home has a loan.
+                            if (loanitem.Principal > home.Value) cansell = false;
+                            else loan = loanitem;
+                        }
                     }
                 }
                 if (cansell)
@@ -387,7 +393,8 @@ namespace RealEstateGame.Models
         public IEnumerable<Loan> GetLoans()
         {
             var loans = context.Loans.Where(m => m.PlayerId == PlayerId).ToList();
-            return loans;
+            if (loans.Any()) return loans;
+            else return null;
         }
     }
 }
