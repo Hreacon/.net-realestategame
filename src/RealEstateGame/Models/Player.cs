@@ -250,20 +250,39 @@ namespace RealEstateGame.Models
             var home = GetHome(id);
             if (home.Owned == 1)
             {
-                if (Address == home.Address)
-                {
-                    // player lives in house, they sell the home they move into an apartment
-                    MoveIntoApartment();
-                }
+                bool cansell = true;
+                Loan loan = null;
                 // check to see if home has loan
-
-                Money = Money + home.Value;
-                home.Owned = 0;
-                home.ForSale = 1;
-                home.Asking = home.Value + home.Value/10;
-                // TODO make this more realistic
-                addTransaction(new Transaction(PlayerId, home.HomeId, TurnNum, home.Value));
-                SavePlayerAndHome(home);
+                var loans = GetLoans();
+                foreach (var loanitem in loans)
+                {
+                    if (loanitem.HomeId == home.HomeId)
+                    {
+                        // home has a loan.
+                        if (loanitem.Principal > home.Value) cansell = false;
+                        else loan = loanitem;
+                    }
+                }
+                if (cansell)
+                {
+                    if (Address == home.Address)
+                    {
+                        // player lives in house, they sell the home they move into an apartment
+                        MoveIntoApartment();
+                    }
+                    Money = Money + home.Value;
+                    if (loan != null)
+                    {
+                        Money = Money - loan.Principal;
+                        context.Remove(loan);
+                    }
+                    home.Owned = 0;
+                    home.ForSale = 1;
+                    home.Asking = home.Value + home.Value/10;
+                    // TODO make this more realistic
+                    addTransaction(new Transaction(PlayerId, home.HomeId, TurnNum, home.Value));
+                    SavePlayerAndHome(home);
+                }
             }
         }
 
@@ -367,7 +386,8 @@ namespace RealEstateGame.Models
 
         public IEnumerable<Loan> GetLoans()
         {
-            return context.Loans.Where(m => m.PlayerId == PlayerId).ToList();
+            var loans = context.Loans.Where(m => m.PlayerId == PlayerId).ToList();
+            return loans;
         }
     }
 }

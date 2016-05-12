@@ -105,7 +105,7 @@ namespace RealEstateGame.Controllers
                     player.Money = player.Money - home.Asking*.2;
                     home.Owned = 1;
                     _context.Loans.Add(new Loan(player.PlayerId, home.Asking - (home.Asking*.2), GetAPR(), 360,
-                        player.TurnNum));
+                        player.TurnNum, home));
                     player.SavePlayerAndHome(home);
                     return RedirectToAction("Index", "Home");
                 }

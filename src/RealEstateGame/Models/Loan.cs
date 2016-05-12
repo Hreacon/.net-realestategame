@@ -12,22 +12,23 @@ namespace RealEstateGame.Models
         public int LoanId { get; set; }
         [ForeignKey("Player")]
         public int PlayerId { get; set;} 
+        [ForeignKey("Home")]
+        public int HomeId { get; set; }
         public double Principal { get; set; }
         public double APR { get; set; }
         public int Term { get; set; }
         public double Payment { get; set; }
         public int StartTurnNum { get; set; }
         public int PaymentsLeft { get; set; }
-        [NotMapped]
-        public virtual Home home { get; set; }
 
-        public Loan(int playerId, double principal, double apr, int term, int startTurnNum)
+        public Loan(int playerId, double principal, double apr, int term, int startTurnNum, Home inhome)
         {
             PlayerId = playerId;
             Principal = principal;
             APR = apr;
             Term = term;
             StartTurnNum = startTurnNum;
+            HomeId = inhome.HomeId;
 
             Payment = Loan.CalculatePayment(principal, apr, term);
             PaymentsLeft = term;

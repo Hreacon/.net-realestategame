@@ -8,9 +8,10 @@ using RealEstateGame.Models;
 namespace RealEstateGame.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20160512065436_addhometoloan")]
+    partial class addhometoloan
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
             modelBuilder
                 .HasAnnotation("ProductVersion", "7.0.0-rc1-16348")
@@ -181,7 +182,7 @@ namespace RealEstateGame.Migrations
 
                     b.Property<double>("APR");
 
-                    b.Property<int>("HomeId");
+                    b.Property<int?>("HomeHomeId");
 
                     b.Property<double>("Payment");
 
@@ -272,6 +273,13 @@ namespace RealEstateGame.Migrations
                     b.HasOne("RealEstateGame.Models.ApplicationUser")
                         .WithMany()
                         .HasForeignKey("UserId");
+                });
+
+            modelBuilder.Entity("RealEstateGame.Models.Loan", b =>
+                {
+                    b.HasOne("RealEstateGame.Models.Home")
+                        .WithMany()
+                        .HasForeignKey("HomeHomeId");
                 });
         }
     }
