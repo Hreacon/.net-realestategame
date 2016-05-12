@@ -114,9 +114,11 @@ namespace RealEstateGame.Models
                 {
                     if (Money > loan.Payment)
                     {
+                        if (loan.Payment > loan.Principal) loan.Payment = loan.Principal+10;
                         loan.MakePayment();
                         Money = Money - loan.Payment;
-                        context.Loans.Update(loan);
+                        if (loan.Principal <= 0) context.Loans.Remove(loan);
+                        else context.Loans.Update(loan);
                     }
                     // TODO else they lose?
                 }
@@ -253,6 +255,8 @@ namespace RealEstateGame.Models
                     // player lives in house, they sell the home they move into an apartment
                     MoveIntoApartment();
                 }
+                // check to see if home has loan
+
                 Money = Money + home.Value;
                 home.Owned = 0;
                 home.ForSale = 1;

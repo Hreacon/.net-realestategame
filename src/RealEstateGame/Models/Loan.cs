@@ -39,13 +39,28 @@ namespace RealEstateGame.Models
 
         public void MakePayment()
         {
-            Principal = Principal - (Payment - APR/12*Principal);
-            PaymentsLeft = PaymentsLeft - 1;
+            if (Principal > 0)
+            {
+                ReducePrincipal(Payment - APR/12*Principal);
+                PaymentsLeft = PaymentsLeft - 1;
+            }
         }
 
         public void MakeExtraPayment(double amount)
         {
+            ReducePrincipal(amount);
+        }
+
+        private void ReducePrincipal(double amount)
+        {
             Principal = Principal - amount;
+            if (Principal <= 0)
+            {
+                // loan is payed off
+                Payment = 0;
+                PaymentsLeft = 0;
+                Principal = 0;
+            }
         }
 
         public static double CalculatePayment(double principal, double apr, int term)

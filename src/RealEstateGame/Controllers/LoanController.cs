@@ -124,7 +124,15 @@ namespace RealEstateGame.Controllers
                 var extrapayment = Double.Parse(Request.Form[loan.LoanId.ToString()]);
                 if (player.Money > extrapayment && extrapayment > 0)
                 {
+                    if (extrapayment > loan.Principal)
+                    {
+                        extrapayment = loan.Principal;
+                    }
                     loan.MakeExtraPayment(extrapayment);
+                    if (loan.Principal <= 0)
+                    {
+                        _context.Loans.Remove(loan);
+                    }
                     player.Money = player.Money - extrapayment;
                     _context.Loans.Update(loan);
                 }
