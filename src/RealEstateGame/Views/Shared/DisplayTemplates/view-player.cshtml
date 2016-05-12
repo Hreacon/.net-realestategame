@@ -1,5 +1,5 @@
 ﻿@{
-    var player = ViewBag.Player as Player;
+    var player = ViewData["Player"] as Player;
     var loans = player.GetLoans();
 }
 

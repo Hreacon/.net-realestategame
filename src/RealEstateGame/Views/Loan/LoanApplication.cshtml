@@ -1,18 +1,19 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
-*@
+﻿
 @{
     var home = ViewBag.Home as Home;
     var regular = home.GetDownPayment();
     var fha = home.GetFHADownPayment();
     var apr = double.Parse(ViewData["apr"].ToString());
 }
+
 @Html.Partial("ReturnHome")
 
 <h1>The Bank</h1>
 
 <p>Thanks for your pending application!</p>
-<p>If you choose to try an FHA mortgage please remember that you must live in the home for 12 months, and the effective APR is 3 points higher.</p>
+<p>FHA Mortgage Restrictions: The home must be your primary residence for 12 months. No moving, no selling.
+    The effective APR is 3 points higher for Mortgage Insurance. This insurance is for the bank, just so you know. 
+    You can only have one FHA loan.</p>
 
 <div class="playertitle">Address:</div>
 <div class="playervalue">@home.Address</div>
@@ -38,7 +39,7 @@
     @using (Html.BeginForm("RegularLoanApplication", "Loan", FormMethod.Post))
     {
         <input type="hidden" name="homeId" value="@home.HomeId"/>
-        <button>Apply For Loan</button>
+        <button class="btn btn-success ajax" data-target="#rightside">Apply For Loan</button>
     }
 </div>
 <div>
@@ -55,6 +56,6 @@
     @using (Html.BeginForm("FHALoanApplication", "Loan", FormMethod.Post))
     {
         <input type="hidden" name="homeId" value="@home.HomeId" />
-        <button>Apply For Loan</button>
+        <button class="btn btn-success ajax" data-target="#rightside">Apply For Loan</button>
     }
 </div>

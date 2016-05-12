@@ -4,7 +4,7 @@
 @Html.Partial("ReturnHome")
 @using (Html.BeginForm("Move", "Home", FormMethod.Post))
 {
-    <button class="btn btn-danger widebtn" name="HomeId" value="0">Apartment: $800/mo</button>
+    <button class="btn btn-danger widebtn ajax" data-target="#rightside" name="HomeId" value="0">Apartment: $800/mo</button>
 }
 @using (Html.BeginForm("Move", "Home", FormMethod.Post))
 {

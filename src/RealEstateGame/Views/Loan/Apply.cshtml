@@ -1,0 +1,12 @@
+﻿
+@Html.Partial("ReturnHome")
+
+<h1>The Bank</h1>
+
+<p>You can afford @string.Format("{0:C}", ViewData["principal"])</p>
+<p>Which home are you interested in purchasing?</p>
+
+@foreach (var home in ViewBag.Homes)
+{
+    @Html.DisplayFor(model => home, "List-Home-Loan");
+}

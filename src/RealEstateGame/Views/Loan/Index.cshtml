@@ -1,0 +1,24 @@
+﻿@{
+    var loans = ViewBag.Player.GetLoans();
+}
+
+@Html.Partial("ReturnHome")
+
+<h1>The Bank</h1>
+
+<p>The current interest rate is <span class="currentAPR">4.5%</span></p>
+<p>Regular Mortgages require a 20% down payment. If you cannot afford this, try the FHA mortgage option.</p>
+<p>FHA Mortgages require 3.5% down and a condition of @Loan.FHACondition or greater.</p>
+
+<a href="/Loan/Apply" class="btn btn-success ajax" data-target="#rightside">Apply for a Loan</a>
+@if (loans != null)
+{
+    using (Html.BeginForm("ExtraPayments", "Loan", FormMethod.Post))
+    {
+        foreach (var loan in loans)
+        {
+            @Html.DisplayFor(m=>loan, "List-Loan-Bank")
+        }
+        <button class="btn btn-success ajax" data-target="#rightside">Make Extra Payments</button>
+    }
+}

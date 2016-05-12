@@ -83,7 +83,7 @@ namespace RealEstateGame.Controllers
             ViewData["apr"] = GetAPR();
             if (ajax == "true")
             {
-                return PartialView(ViewData["partial"]);
+                return PartialView(ViewData["partial"].ToString());
             }
             return View("MainPage");
         }
@@ -118,6 +118,20 @@ namespace RealEstateGame.Controllers
         public IActionResult FhaLoanApplication(FormCollection col, string ajax)
         {
             var player = GetPlayer();
+            bool hasFHA = false;
+            var loans = player.GetLoans();
+            if (loans != null)
+            {
+                foreach (var loan in loans)
+                {
+                    if (loan.LoanType == 1)
+                    {
+                        hasFHA = true;
+                        break;
+                    }
+                }
+            }
+            if (hasFHA) return Content("You already have an FHA Loan");
             int homeId = 0;
             int.TryParse(Request.Form["homeId"], out homeId);
             if (homeId > 0)
@@ -130,6 +144,7 @@ namespace RealEstateGame.Controllers
                     player.Money = player.Money - totalCost;
                     if(home.Condition < 7 ) home.ImproveToCondition(Loan.FHACondition);
                     home.Owned = 1;
+                    player.MoveIntoHome(home);
                     _context.Loans.Add(new Loan(player.PlayerId, home.Asking - home.GetFHADownPayment(), GetAPR(), 360,
                         player.TurnNum, home, 1));
                     player.SavePlayerAndHome(home);

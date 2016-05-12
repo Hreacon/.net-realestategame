@@ -4,5 +4,5 @@
     <div class="termcol">@Model.PaymentsLeft</div>
     <div class="principalcol">@string.Format("{0:C}", Model.Principal)</div>
     <div class="paymentcol">@string.Format("{0:C}", Model.Payment)</div>
-    <div class="extrapaymentcol"><input type="number" value="0" name="@Model.LoanId"/></div>
+    <div class="extrapaymentcol"><input type="number" value="0" step=".01" min="0" name="@Model.LoanId"/></div>
 </div>

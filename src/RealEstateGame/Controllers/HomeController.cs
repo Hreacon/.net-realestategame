@@ -200,13 +200,16 @@ namespace RealEstateGame.Controllers
             int HomeId = 0;
             Int32.TryParse(Request.Form["homeId"], out HomeId);
             ViewBag.Player = GetPlayer();
+            string errorMessage = "You can't move right now. FHA Loan Restrictions";
             if (HomeId > 0)
             {
-                ViewBag.Player.MoveIntoHome(HomeId);
+                if (!ViewBag.Player.MoveIntoHome(HomeId))
+                    return Content(errorMessage);
             }
             else
             {
-                ViewBag.Player.MoveIntoApartment();
+                if (!ViewBag.Player.MoveIntoApartment())
+                    return Content(errorMessage);
             }
             if (Request.Form["ajax"].ToString() == "true")
             {
@@ -220,7 +223,8 @@ namespace RealEstateGame.Controllers
         public IActionResult Sell(FormCollection collection)
         {
             ViewBag.Player = GetPlayer();
-            ViewBag.Player.SellHome(Int32.Parse(Request.Form["homeId"]));
+            if (!ViewBag.Player.SellHome(Int32.Parse(Request.Form["homeId"])))
+                return Content("You can't sell this home right now");
             if (Request.Form["ajax"].ToString() == "true")
             {
                 return PartialView("PortfolioPartial");
