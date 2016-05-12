@@ -363,7 +363,7 @@ namespace RealEstateGame.Models
 
         public IEnumerable<Loan> GetLoans()
         {
-            return context.Loans.Where(m => m.PlayerId == PlayerId).Include(m=>m.home).ToList();
+            return context.Loans.Where(m => m.PlayerId == PlayerId).ToList();
         }
     }
 }

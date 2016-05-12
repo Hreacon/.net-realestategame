@@ -91,6 +91,7 @@ namespace RealEstateGame.Controllers
         [HttpPost]
         public IActionResult RegularLoanApplication(FormCollection col, string ajax)
         {
+            // todo ajax
             var player = GetPlayer();
             var stringhomeId = Request.Form["homeId"];
             int homeId = 0;
@@ -112,5 +113,24 @@ namespace RealEstateGame.Controllers
             return RedirectToAction("Index", "Home");
         }
 
+        [HttpPost]
+        public IActionResult ExtraPayments(FormCollection col, string ajax)
+        {
+            // todo ajax
+            var player = GetPlayer();
+            var loans = player.GetLoans();
+            foreach (var loan in loans)
+            {
+                var extrapayment = Double.Parse(Request.Form[loan.LoanId.ToString()]);
+                if (player.Money > extrapayment && extrapayment > 0)
+                {
+                    loan.MakeExtraPayment(extrapayment);
+                    player.Money = player.Money - extrapayment;
+                    _context.Loans.Update(loan);
+                }
+            }
+            player.Save();
+            return RedirectToAction("Index");
+        }
     }
 }
