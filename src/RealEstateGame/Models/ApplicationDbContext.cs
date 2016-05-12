@@ -21,5 +21,6 @@ namespace RealEstateGame.Models
         public DbSet<Home> Homes { get; set; }
         public DbSet<Loan> Loans { get; set; }
         public DbSet<Transaction> Transactions { get; set; }
+        public DbSet<Renter> Renters { get; private set; }
     }
 }

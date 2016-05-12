@@ -8,9 +8,10 @@ using RealEstateGame.Models;
 namespace RealEstateGame.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20160512192154_addrenters")]
+    partial class addrenters
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
             modelBuilder
                 .HasAnnotation("ProductVersion", "7.0.0-rc1-16348")
@@ -226,26 +227,6 @@ namespace RealEstateGame.Migrations
                     b.Property<string>("Username");
 
                     b.HasKey("PlayerId");
-                });
-
-            modelBuilder.Entity("RealEstateGame.Models.Renter", b =>
-                {
-                    b.Property<int>("RenterId")
-                        .ValueGeneratedOnAdd();
-
-                    b.Property<double>("Budget");
-
-                    b.Property<int>("Damage");
-
-                    b.Property<int>("HomeId");
-
-                    b.Property<string>("Name");
-
-                    b.Property<int>("PlayerId");
-
-                    b.Property<int>("Renting");
-
-                    b.HasKey("RenterId");
                 });
 
             modelBuilder.Entity("RealEstateGame.Models.Transaction", b =>
