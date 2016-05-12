@@ -128,7 +128,6 @@ namespace RealEstateGame.Controllers
                     await _userManager.CreateAsync(admin, "!23Qwer");
                     await _userManager.AddToRoleAsync(admin, "Admin");
                     await _userManager.AddToRoleAsync(admin, "Player");
-                    // TODO add role to this user for admin privaledges
                 }
 
                 var result = await _userManager.CreateAsync(user, model.Password);

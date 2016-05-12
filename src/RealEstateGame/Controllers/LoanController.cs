@@ -15,7 +15,7 @@ namespace RealEstateGame.Controllers
     [Authorize(Roles = "Player")]
     public class LoanController : Controller
     {
-        private ApplicationDbContext _context;
+        private readonly ApplicationDbContext _context;
 
         public LoanController(ApplicationDbContext context)
         {
@@ -91,7 +91,6 @@ namespace RealEstateGame.Controllers
         [HttpPost]
         public IActionResult RegularLoanApplication(FormCollection col, string ajax)
         {
-            // todo ajax
             var player = GetPlayer();
             var stringhomeId = Request.Form["homeId"];
             int homeId = 0;
@@ -157,29 +156,26 @@ namespace RealEstateGame.Controllers
         [HttpPost]
         public IActionResult ExtraPayments(FormCollection col, string ajax)
         {
-            // todo ajax
             var player = GetPlayer();
             var loans = player.GetLoans();
             if (loans != null)
             {
                 foreach (var loan in loans)
                 {
-                    var extrapayment = Double.Parse(Request.Form[loan.LoanId.ToString()]);
-                    if (player.Money > extrapayment && extrapayment > 0)
+                    var extrapayment = double.Parse(Request.Form[loan.LoanId.ToString()]); 
+                    if (!(player.Money > extrapayment) || !(extrapayment > 0)) continue; // continue jumps to next iteration of loop
+                    if (extrapayment > loan.Principal)
                     {
-                        if (extrapayment > loan.Principal)
-                        {
-                            extrapayment = loan.Principal;
-                        }
-                        loan.MakeExtraPayment(extrapayment);
-                        if (loan.Principal <= 0)
-                        {
-                            _context.Loans.Remove(loan);
-                        }
-                        player.Money = player.Money - extrapayment;
-                        _context.Loans.Update(loan);
+                        extrapayment = loan.Principal;
                     }
+                    loan.MakeExtraPayment(extrapayment);
+                    if (loan.Principal <= 0)
+                    {
+                        _context.Loans.Remove(loan);
+                    } else _context.Loans.Update(loan);
+                    player.Money = player.Money - extrapayment;
                 }
+                player.context = _context;
                 player.Save();
             }
             return RedirectToAction("Index", new {ajax=ajax});
