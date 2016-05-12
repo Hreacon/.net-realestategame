@@ -16,3 +16,19 @@
     <div class="playertitle">@Html.DisplayNameFor(m => player.TurnNum)</div><div class="playervalue">@player.TurnNum</div>
     <div class="playertitle">@Html.DisplayNameFor(m => player.Actions)</div><div class="playervalue">@player.Actions</div>
 </div>
+<div class="loaninfo">
+    <div class="loanheader">
+        <div class="loancol1">Address:</div>
+        <div class="loancol2">Principal</div>
+        <div class="loancol3">Payment</div>
+        <div class="loancol4">Term</div>
+    </div>
+    @foreach (var loan in @player.GetLoans())
+    {
+        <div class="loan">
+            <div class="loancol2">@string.Format("{0:C}", loan.Principal)</div>
+            <div class="loancol3">@string.Format("{0:C}", loan.Payment)</div>
+            <div class="loancol4">@loan.Term</div>
+        </div>
+    }
+</div>

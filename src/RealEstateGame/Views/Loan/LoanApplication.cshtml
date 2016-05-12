@@ -1,0 +1,50 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+    var home = ViewBag.Home as Home;
+    var regular = home.Asking*.2;
+    var fha = home.Asking*.035;
+    var apr = double.Parse(ViewData["apr"].ToString());
+}
+@Html.Partial("ReturnHome")
+
+<h1>The Bank</h1>
+
+<p>Thanks for your pending application!</p>
+<p>If you choose to try an FHA mortgage please remember that you must live in the home for 12 months, and the effective APR is 3 points higher.</p>
+
+<div class="playertitle">Address:</div>
+<div class="playervalue">@home.Address</div>
+<div class="playertitle">Current Value:</div>
+<div class="playervalue">@home.Value</div>
+<div class="playertitle">Asking Price:</div>
+<div class="playervalue">@home.Asking</div>
+<div class="playertitle">Current Condition:</div>
+<div class="playervalue">@home.Condition</div>
+<div class="playertitle">Term:</div>
+<div class="playervalue">30 Year</div>
+@if (home.Condition < 7)
+{
+    <div class="playertitle">Cost to Improve to 7:</div>
+    <div class="playervalue">@string.Format("{0:C}", home.CostToCondition(7))</div>
+}
+<div>
+    <p>Regular Mortgage</p>
+    <div class="playertitle">Regular Mortgage 20% Down:</div>
+    <div class="playervalue">@string.Format("{0:C}", regular)</div>
+    <div class="playertitle">Regular Mortgage Payment:</div>
+    <div class="playervalue">@string.Format("{0:C}", Loan.CalculatePayment(home.Asking - regular, apr, 360))</div>
+    @using (Html.BeginForm("RegularLoanApplication", "Loan", FormMethod.Post))
+    {
+        <input type="hidden" name="homeId" value="@home.HomeId"/>
+        <button>Apply For Loan</button>
+    }
+</div>
+<div>
+    <p>FHA Mortgage</p>
+    <div class="playertitle">FHA Mortgage 3.5% Down:</div>
+    <div class="playervalue">@string.Format("{0:C}", fha)</div>
+    <div class="playertitle">FHA Mortgage Payment:</div>
+    <div class="playervalue">@string.Format("{0:C}", Loan.CalculatePayment(home.Asking - fha, apr + .03, 360))</div>
+</div>

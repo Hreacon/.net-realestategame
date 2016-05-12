@@ -86,6 +86,8 @@ namespace RealEstateGame.Controllers
 
         public IActionResult Index(string ajax)
         {
+            ViewBag.Payemnt = Loan.CalculatePayment(100000, .045, 360);
+            ViewBag.Principal = Loan.CalculateAffordableAmount(1300, .045, 360);
             if (User.IsSignedIn())
             {
                 ViewBag.Player = GetPlayer();

@@ -72,11 +72,11 @@ textarea {
 .playervalue {
     display: inline-block;
     width: 55%; 
-
 }
 .playertitle, .playervalue {
     border-bottom: lightgray 1px solid;
 }
+
 .playercard {
     border: 1px solid black;
     border-radius: 10px;
@@ -96,4 +96,8 @@ textarea {
     background: lightslategray;
     width: 100%;
     display: none;
+}
+
+.currentAPR {
+    font-weight: bold;
 }

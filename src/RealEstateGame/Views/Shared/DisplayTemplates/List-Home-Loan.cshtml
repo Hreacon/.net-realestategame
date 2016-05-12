@@ -1,5 +1,8 @@
 ﻿@model RealEstateGame.Models.Home
-
+@{
+    var regular = Model.Asking*.2;
+    var fha = Model.Asking*.035;
+}
 <div class="list-home col-sm-12">
     <p>@Model.Address</p>
     <hr/>
@@ -11,6 +14,10 @@
         </ul>
     </div>
     <div class="col-sm-5">
-        <button name="homeId" class="btn btn-success" value="@Model.HomeId">@ViewData["Button"]</button>
+        <ul>
+            <li>20% Down:@string.Format("{0:C}", regular)</li>
+            <li>3.5% Down: @string.Format("{0:C}", fha)</li>
+        </ul>
+        <a href="/Loan/Application/@Model.HomeId" class="btn btn-success">Apply for Mortgage</a>
     </div>
 </div>

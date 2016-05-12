@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -6,6 +7,7 @@ using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.Data.Entity.Metadata.Internal;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.Data.Entity;
 
 namespace RealEstateGame.Models
 {
@@ -105,6 +107,19 @@ namespace RealEstateGame.Models
                 
                 // add income
                 Money = Money + Income - Rent;
+
+                // pay loans
+                var loans = GetLoans();
+                foreach (var loan in loans)
+                {
+                    if (Money > loan.Payment)
+                    {
+                        loan.MakePayment();
+                        Money = Money - loan.Payment;
+                        context.Loans.Update(loan);
+                    }
+                    // TODO else they lose?
+                }
 
                 // randomly houses change for sale status
                 if (HaveContext())
@@ -344,6 +359,11 @@ namespace RealEstateGame.Models
         public bool HaveContext()
         {
             return context != null;
+        }
+
+        public IEnumerable<Loan> GetLoans()
+        {
+            return context.Loans.Where(m => m.PlayerId == PlayerId).Include(m=>m.home).ToList();
         }
     }
 }
