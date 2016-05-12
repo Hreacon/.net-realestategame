@@ -146,6 +146,11 @@ namespace RealEstateGame.Models
             return Asking*.035;
         }
 
+        public double GetRent()
+        {
+            return Value*.0075;
+        }
+
         public void Degrade(Random rand = null)
         {
             if (Condition > 0)

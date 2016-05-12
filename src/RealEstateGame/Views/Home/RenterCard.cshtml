@@ -1,0 +1,15 @@
+﻿@{
+    var renter = ViewBag.Renter as Renter;
+}
+
+<h2>Renter Application</h2>
+<div class="playertitle">Name:</div>
+<div class="playervalue">@renter.Name</div>
+<div class="playertitle">Damage:</div>
+<div class="playervalue">@renter.Damage</div>
+
+<div>
+    <h2>Choice:</h2>
+    <div><a href="/Home/AcceptRenter/@renter.RenterId" class="btn btn-success widebtn ajax" data-target="#rightside">Accept Renter</a></div>
+    <div><a href="/Home" class="btn btn-danger widebtn ajax" data-target="#rightside">Deny Renter</a></div>
+</div>

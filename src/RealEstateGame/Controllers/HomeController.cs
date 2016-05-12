@@ -56,7 +56,6 @@ namespace RealEstateGame.Controllers
                 _context.SaveChanges();
                 player = GetPlayer();
                 _context.Homes.AddRange(Home.GenerateHomes(player.PlayerId));
-                // TODO Generate renters
                 _context.Renters.AddRange(Renter.GenerateRenters(player.PlayerId));
                 _context.SaveChanges();
             }
@@ -276,6 +275,26 @@ namespace RealEstateGame.Controllers
                     break;
             }
             return RedirectToAction("Index");
+        }
+
+        [Authorize(Roles = "Player")]
+        public IActionResult RentHome(int id, string ajax)
+        {
+            var player = GetPlayer();
+            var home = _context.Homes.First(m => m.HomeId == id);
+            Random rand = new Random();
+            Renter renter = null;
+            while (renter == null)
+            {   
+                var rid = rand.Next(1, _context.Renters.Count());
+                renter = _context.Renters.FirstOrDefault(m => m.RenterId == rid && m.Budget > home.GetRent());
+                if (renter != null && renter.Renting == 1 || renter.Budget < home.GetRent()) renter = null;
+            }
+            ViewBag.Renter = renter;
+            ViewBag.Player = player;
+            ViewBag.Partial = "RenterCard";
+            if (ajax == "true") return PartialView(ViewBag.Partial.ToString());
+            return View("MainPage");
         }
         
         public IActionResult About()
