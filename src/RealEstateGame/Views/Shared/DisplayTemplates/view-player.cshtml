@@ -1,6 +1,7 @@
 ﻿@{
     var player = ViewData["Player"] as Player;
     var loans = player.GetLoans();
+    var rentalIncome = player.RentalIncome;
 }
 
 <div class="playercard">
@@ -16,6 +17,10 @@
     <div class="playertitle">@Html.DisplayNameFor(m => player.Rent)</div><div class="playervalue">@string.Format("{0:C}", player.Rent)</div>
     <div class="playertitle">@Html.DisplayNameFor(m => player.TurnNum)</div><div class="playervalue">@player.TurnNum</div>
     <div class="playertitle">@Html.DisplayNameFor(m => player.Actions)</div><div class="playervalue">@player.Actions</div>
+    @if (rentalIncome > 0)
+    {
+        <div class="playertitle">@Html.DisplayNameFor(m => player.RentalIncome)</div><div class="playervalue">@string.Format("{0:C}",rentalIncome)</div>
+    }
 </div>
 <div class="loaninfo">
     <div class="loanheader">
