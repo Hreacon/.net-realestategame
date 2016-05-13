@@ -14,6 +14,14 @@
             @if (Model.Rented == 1)
             {
                 <li>Rented for @string.Format("{0:C}", Model.renter.Rent)</li>
+                if (Model.GetRent() != Model.renter.Rent)
+                {
+                    <li>Potential Rent: @string.Format("{0:C}", Model.GetRent())</li>
+                }
+            }
+            else
+            {
+                    <li>Potential Rent: @string.Format("{0:C}", Model.GetRent())</li>
             }
         </ul>
     </div>
