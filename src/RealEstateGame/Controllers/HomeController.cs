@@ -285,16 +285,36 @@ namespace RealEstateGame.Controllers
             Random rand = new Random();
             Renter renter = null;
             while (renter == null)
-            {   
+            {
                 var rid = rand.Next(1, _context.Renters.Count());
                 renter = _context.Renters.FirstOrDefault(m => m.RenterId == rid && m.Budget > home.GetRent());
                 if (renter != null && renter.Renting == 1 || renter.Budget < home.GetRent()) renter = null;
             }
             ViewBag.Renter = renter;
-            ViewBag.Player = player;
+            ViewBag.Home = home;
             ViewBag.Partial = "RenterCard";
             if (ajax == "true") return PartialView(ViewBag.Partial.ToString());
             return View("MainPage");
+        }
+
+        [Authorize(Roles = "Player")]
+        public IActionResult AcceptRenter(int id, int homeId, string ajax)
+        {
+            var player = GetPlayer();
+            var renter = _context.Renters.FirstOrDefault(m => m.RenterId == id);
+            var home = _context.Homes.FirstOrDefault(m => m.HomeId == homeId);
+            renter.Renting = 1;
+            home.Rented = 1;
+            renter.Rent = home.GetRent();
+            renter.HomeId = home.HomeId;
+            renter.StartTurnNum = player.TurnNum;
+
+            _context.Renters.Update(renter);
+            _context.Homes.Update(home);
+            _context.Players.Update(player);
+            _context.SaveChanges();
+            
+            return RedirectToAction("Portfolio", new {ajax = ajax});
         }
         
         public IActionResult About()

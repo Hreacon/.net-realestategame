@@ -1,5 +1,6 @@
 ﻿@{
     var renter = ViewBag.Renter as Renter;
+    var home = ViewBag.Home as Home;
 }
 
 <h2>Renter Application</h2>
@@ -10,6 +11,6 @@
 
 <div>
     <h2>Choice:</h2>
-    <div><a href="/Home/AcceptRenter/@renter.RenterId" class="btn btn-success widebtn ajax" data-target="#rightside">Accept Renter</a></div>
+    <div><a href="/Home/AcceptRenter/@renter.RenterId?homeId=@home.HomeId" class="btn btn-success widebtn ajax" data-target="#rightside">Accept Renter</a></div>
     <div><a href="/Home" class="btn btn-danger widebtn ajax" data-target="#rightside">Deny Renter</a></div>
 </div>

@@ -19,6 +19,10 @@ namespace RealEstateGame.Models
         public int Damage { get; set; }
         public int Renting { get; set; }
         public int HomeId { get; set; }
+        public int StartTurnNum { get; set; }
+        public double Rent { get; set; }
+
+        [NotMapped] public static readonly int Term = 12;
 
         public static IEnumerable<Renter> GenerateRenters(int playerId, int amount = 30, Random rand = null)
         {
