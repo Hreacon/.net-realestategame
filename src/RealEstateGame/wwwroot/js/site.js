@@ -14,8 +14,7 @@
         type: 'GET',
         url: href,
         success: function (result) {
-            $(target).html(result);
-            ajaxInit();
+            ajaxReturn(target, result);
         }
     });
 }
@@ -29,15 +28,18 @@ function ajaxPost(form, target) {
         type: 'POST',
         url: href,
         data: $(form).serialize(),
-        success: function (result) {
-            console.log("post success");
-            if (result.trim().substr(0, 1) == "<") {
-                $(target).html(result);
-                updatePlayer();
-                ajaxInit();
-            } else message(result);
+        success: function(result) {
+            ajaxReturn(target, result);
         }
-    });
+});
+}
+function ajaxReturn(target, result) {
+    console.log("post success");
+    if (result.trim().substr(0, 1) == "<") {
+        $(target).html(result);
+        updatePlayer();
+        ajaxInit();
+    } else message(result);
 }
 function updatePlayer() {
     console.log("Update Player");
