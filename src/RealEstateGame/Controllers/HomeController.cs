@@ -287,6 +287,7 @@ namespace RealEstateGame.Controllers
             var renters = _context.Renters.Where(m => m.PlayerId == player.PlayerId && m.Renting == 0 && m.Budget > rent).ToList();
             if (!renters.Any()) return Content("No Renters are available for this property.");
             // TODO: Make low damage renters pickier about their accomodations
+            ViewBag.Player = player;
             ViewBag.Renter = renters[rand.Next(0, renters.Count-1)];
             ViewBag.Home = home;
             ViewBag.Partial = "RenterCard";
