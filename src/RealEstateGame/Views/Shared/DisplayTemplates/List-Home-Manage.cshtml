@@ -6,10 +6,13 @@
     <div class="col-sm-7">
         <ul>
             <li>Value: @string.Format("{0:C0}", Model.Value)</li>
-            <li>Asking: @string.Format("{0:C0}", Model.Asking)</li>
             <li>Condition: @Model.Condition</li>
             @if(Model.Condition < 10) {
                 <li>Cost to Improve: @string.Format("{0:C}", Model.GetCostImprovement())</li>
+            }
+            @if (Model.loan != null)
+            {
+                <li>Loan Payment: @string.Format("{0:C}", Model.loan.Payment)</li>
             }
             @if (Model.Rented == 1)
             {
@@ -18,6 +21,8 @@
                 {
                     <li>Potential Rent: @string.Format("{0:C}", Model.GetRent())</li>
                 }
+                <li>Rented on Turn: @Model.renter.StartTurnNum</li>
+                <li>Rental Term: @Renter.Term</li>
             }
             else
             {

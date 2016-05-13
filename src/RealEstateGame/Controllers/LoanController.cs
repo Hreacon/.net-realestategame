@@ -103,8 +103,9 @@ namespace RealEstateGame.Controllers
                     // player can afford loan
                     player.Money = player.Money - home.Asking*.2;
                     home.Owned = 1;
-                    _context.Loans.Add(new Loan(player.PlayerId, home.Asking - home.GetDownPayment(), GetAPR(), 360,
-                        player.TurnNum, home));
+                    var loan = _context.Loans.Add(new Loan(player.PlayerId, home.Asking - home.GetDownPayment(), GetAPR(), 360,
+                        player.TurnNum, home)).Entity;
+                    home.loan = loan;
                     player.SavePlayerAndHome(home);
                     return RedirectToAction("Index", "Home", new {ajax=ajax});
                 }
@@ -144,8 +145,9 @@ namespace RealEstateGame.Controllers
                     if(home.Condition < 7 ) home.ImproveToCondition(Loan.FHACondition);
                     home.Owned = 1;
                     player.MoveIntoHome(home);
-                    _context.Loans.Add(new Loan(player.PlayerId, home.Asking - home.GetFHADownPayment(), GetAPR(), 360,
-                        player.TurnNum, home, 1));
+                    var loan = _context.Loans.Add(new Loan(player.PlayerId, home.Asking - home.GetFHADownPayment(), GetAPR(), 360,
+                        player.TurnNum, home, 1)).Entity;
+                    home.loan = loan;
                     player.SavePlayerAndHome(home);
                     return RedirectToAction("Index", "Home", new {ajax=ajax});
                 }
@@ -171,6 +173,9 @@ namespace RealEstateGame.Controllers
                     loan.MakeExtraPayment(extrapayment);
                     if (loan.Principal <= 0)
                     {
+                        var home = _context.Homes.FirstOrDefault(m => m.HomeId == loan.HomeId);
+                        home.loan = null;
+                        _context.Homes.Update(home);
                         _context.Loans.Remove(loan);
                     } else _context.Loans.Update(loan);
                     player.Money = player.Money - extrapayment;

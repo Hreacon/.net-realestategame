@@ -155,7 +155,11 @@ namespace RealEstateGame.Models
                             if (loan.Payment > loan.Principal) loan.Payment = loan.Principal+10;
                             loan.MakePayment();
                             Money = Money - loan.Payment;
-                            if (loan.Principal <= 0) context.Loans.Remove(loan);
+                            if (loan.Principal <= 0)
+                            {
+                                context.Homes.FirstOrDefault(m => m.HomeId == loan.HomeId).loan = null;
+                                context.Loans.Remove(loan);
+                            }
                             else context.Loans.Update(loan);
                         }
                         // TODO else they lose?
@@ -432,7 +436,7 @@ namespace RealEstateGame.Models
         {
             if (HaveContext())
             {
-                return context.Homes.Where(m => m.PlayerId == PlayerId && m.Owned == 1).Include(m=>m.renter).ToList();
+                return context.Homes.Where(m => m.PlayerId == PlayerId && m.Owned == 1).Include(m=>m.renter).Include(m=>m.loan).ToList();
             }
             return null;
         }
