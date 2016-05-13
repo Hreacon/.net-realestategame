@@ -374,7 +374,9 @@ namespace RealEstateGame.Models
 
         public bool MoveIntoHome(int id)
         {
-            return MoveIntoHome(GetHome(id));
+            var home = GetHome(id);
+            if (home.Rented == 1) return false;
+            return MoveIntoHome(home);
         }
 
         public bool MoveIntoHome(Home home)
