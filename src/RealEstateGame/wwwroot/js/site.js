@@ -33,7 +33,7 @@ function ajaxPost(form, target) {
         url: href,
         data: $(form).serialize(),
         success: function(result) {
-            ajaxReturn(target, result);
+            ajaxReturn(target, result, '');
         }
 });
 }

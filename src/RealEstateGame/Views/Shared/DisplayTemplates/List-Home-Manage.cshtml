@@ -48,10 +48,18 @@
         {
             using (Html.BeginForm("Move", "Home", FormMethod.Post))
             {
-                <input type="hidden" name="homeId" value="@Model.HomeId" />
+                <input type="hidden" name="homeId" value="@Model.HomeId"/>
                 <button class="btn btn-default managehomebuttons ajax" data-target="#rightside">Move Here</button>
             }
             <a href="/Home/RentHome/@Model.HomeId" class="btn btn-primary managehomebuttons ajax" data-target="#rightside">Rent This Home</a>
+        }
+        else
+        {
+            using (Html.BeginForm("RemoveRenter", "Home", FormMethod.Post))
+            {
+                <input type="hidden" name="homeId" value="@Model.HomeId"/>
+                <button class="btn btn-default managehomebuttons ajax" data-target="#rightside">Kick Renter Out</button>
+            }
         }
     </div>
 </div>

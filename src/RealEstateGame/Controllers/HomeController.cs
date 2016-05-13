@@ -9,6 +9,7 @@ using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.AspNet.Mvc;
 using RealEstateGame.Models;
+using Microsoft.Data.Entity;
 
 namespace RealEstateGame.Controllers
 {
@@ -282,16 +283,17 @@ namespace RealEstateGame.Controllers
         {
             var player = GetPlayer();
             var home = _context.Homes.First(m => m.HomeId == id);
+            if (home.Address == player.Address) return Content("You live here");
             var rent = home.GetRent();
             Random rand = new Random();
             var renters = _context.Renters.Where(m => m.PlayerId == player.PlayerId && m.Renting == 0 && m.Budget > rent).ToList();
             if (!renters.Any()) return Content("No Renters are available for this property.");
             // TODO: Make low damage renters pickier about their accomodations
-            ViewBag.Player = player;
             ViewBag.Renter = renters[rand.Next(0, renters.Count-1)];
             ViewBag.Home = home;
             ViewBag.Partial = "RenterCard";
             if (ajax == "true") return PartialView(ViewBag.Partial.ToString());
+            ViewBag.Player = player;
             return View("MainPage");
         }
 
@@ -338,6 +340,28 @@ namespace RealEstateGame.Controllers
         public IActionResult Error()
         {
             return View();
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "Player")]
+        public IActionResult RemoveRenter(FormCollection col, string ajax)
+        {
+            var player = GetPlayer();
+            int homeId = 0;
+            int.TryParse(Request.Form["homeId"], out homeId);
+            if (homeId == 0) return Content("Error");
+            var home = _context.Homes.Include(m=>m.renter).FirstOrDefault(m => m.HomeId == homeId);
+            
+            var renter = home.renter;
+            if (!(player.TurnNum > renter.StartTurnNum + Renter.Term)) return Content("Rental term isn't up yet");
+            home.renter = null;
+            renter.Renting = 0;
+            renter.HomeId = 0;
+            home.Rented = 0;
+            _context.Homes.Update(home);
+            _context.Renters.Update(renter);
+            _context.SaveChanges();
+            return RedirectToAction("Portfolio", new {ajax = ajax});
         }
     }
 }
