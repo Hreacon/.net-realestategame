@@ -103,7 +103,8 @@ $(document)
         var $window = $(window);
         var player = $("#viewplayer");
         $window.scroll(function () {
-            player.css('margin-top', window.pageYOffset);
+            if($window.width() > 992)
+                player.css('margin-top', window.pageYOffset);
         });
     });
 
