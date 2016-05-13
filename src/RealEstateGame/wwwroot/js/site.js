@@ -45,7 +45,9 @@ function ajaxReturn(target, result, tag) {
         ajaxInit();
         if (tag.length > 0) {
             console.log('scroll');
-            $(window).scrollTop($(tag).offset().top);
+            $(window).scrollTop($(tag).offset().top-100);
+        } else {
+            $(window).scrollTop(0);
         }
     } else message(result);
 }
