@@ -302,6 +302,14 @@ namespace RealEstateGame.Models
             }
             home.Owned = 0;
             home.ForSale = 1;
+            if (home.Rented == 1) // home is rented. Get rid of the renter.
+            {
+                home.Rented = 0;
+                var renter = context.Renters.FirstOrDefault(m => m.HomeId == home.HomeId);
+                renter.Renting = 0;
+                renter.HomeId = 0;
+                context.Update(renter);
+            }
             home.Asking = home.Value + home.Value/10;
             // TODO make this more realistic
             addTransaction(new Transaction(PlayerId, home.HomeId, TurnNum, home.Value));
