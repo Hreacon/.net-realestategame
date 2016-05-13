@@ -3,7 +3,11 @@
     // Also "breakproof". Site works with refreshing and even if there's no javascript.
     console.log("ajax");
     window.history.pushState('RealEstateGame', 'RealEstateGame', href);
-
+    var tag = '';
+    if (href.includes("#")) {
+        tag = href.substring(href.indexOf("#"));
+        href = href.substring(0, href.indexOf("#"));
+    }
     if (href.includes("?")) {
         href = href + "&ajax=true";
     } else {
@@ -14,7 +18,7 @@
         type: 'GET',
         url: href,
         success: function (result) {
-            ajaxReturn(target, result);
+            ajaxReturn(target, result, tag);
         }
     });
 }
@@ -33,12 +37,16 @@ function ajaxPost(form, target) {
         }
 });
 }
-function ajaxReturn(target, result) {
+function ajaxReturn(target, result, tag) {
     console.log("post success");
     if (result.trim().substr(0, 1) == "<") {
         $(target).html(result);
         updatePlayer();
         ajaxInit();
+        if (tag.length > 0) {
+            console.log('scroll');
+            $(window).scrollTop($(tag).offset().top);
+        }
     } else message(result);
 }
 function updatePlayer() {
@@ -93,7 +101,6 @@ $(document)
         var $window = $(window);
         var player = $("#viewplayer");
         $window.scroll(function () {
-            console.log("Scroll", window.pageYOffset);
             player.css('margin-top', window.pageYOffset);
         });
     });
