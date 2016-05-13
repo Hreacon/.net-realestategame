@@ -67,6 +67,22 @@ namespace RealEstateGame.Models
             }
         }
 
+        [NotMapped]
+        public double LoanPayments
+        {
+            get
+            {
+                double loanPayments = 0;
+                var loans = GetLoans();
+                if(loans == null) return loanPayments;
+                foreach (var loan in loans)
+                {
+                    loanPayments += loan.Payment;
+                }
+                return loanPayments;
+            }
+        }
+
         public bool IsSelfEmployed()
         {
             return Job == Jobs[2];
@@ -248,7 +264,7 @@ namespace RealEstateGame.Models
             };
         }
 
-        public void addTransaction(Transaction sale)
+        public void AddTransaction(Transaction sale)
         {
             context.Transactions.Add(sale);
         }
@@ -261,7 +277,7 @@ namespace RealEstateGame.Models
                 Money = Money - home.Asking;
                 home.Owned = 1;
                 home.ForSale = 0;
-                addTransaction(new Transaction(PlayerId, home.HomeId, TurnNum, home.Asking));
+                AddTransaction(new Transaction(PlayerId, home.HomeId, TurnNum, home.Asking));
                 SavePlayerAndHome(home);
                 return true;
             }
@@ -312,7 +328,7 @@ namespace RealEstateGame.Models
             }
             home.Asking = home.Value + home.Value/10;
             // TODO make this more realistic
-            addTransaction(new Transaction(PlayerId, home.HomeId, TurnNum, home.Value));
+            AddTransaction(new Transaction(PlayerId, home.HomeId, TurnNum, home.Value));
             SavePlayerAndHome(home);
             return true;
         }
