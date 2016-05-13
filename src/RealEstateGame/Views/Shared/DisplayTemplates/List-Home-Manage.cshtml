@@ -11,6 +11,10 @@
             @if(Model.Condition < 10) {
                 <li>Cost to Improve: @string.Format("{0:C}", Model.GetCostImprovement())</li>
             }
+            @if (Model.Rented == 1)
+            {
+                <li>Rented</li>
+            }
         </ul>
     </div>
     <div class="col-sm-5">
@@ -32,6 +36,6 @@
             <input type="hidden" name="homeId" value="@Model.HomeId" />
             <button class="btn btn-danger ajax" data-target="#rightside">Sell This Home</button>
         }
-        <a href="/Home/RentHome/@Model.HomeId" class="btn btn-warn widebtn ajax" data-target="#rightside">Rent This Home</a>
+        <a href="/Home/RentHome/@Model.HomeId" class="btn btn-primary ajax" data-target="#rightside">Rent This Home</a>
     </div>
 </div>

@@ -282,24 +282,27 @@ namespace RealEstateGame.Controllers
         {
             var player = GetPlayer();
             var home = _context.Homes.First(m => m.HomeId == id);
+            var rent = home.GetRent();
             Random rand = new Random();
-            Renter renter = null;
-            while (renter == null)
-            {
-                var rid = rand.Next(1, _context.Renters.Count());
-                renter = _context.Renters.FirstOrDefault(m => m.RenterId == rid && m.Budget > home.GetRent());
-                if (renter != null && renter.Renting == 1 || renter.Budget < home.GetRent()) renter = null;
-            }
-            ViewBag.Renter = renter;
+            var renters = _context.Renters.Where(m => m.PlayerId == player.PlayerId && m.Renting == 0 && m.Budget < rent).ToList();
+            if (!renters.Any()) return Content("No Renters are available for this property.");
+            // TODO: Make low damage renters pickier about their accomodations
+            ViewBag.Renter = renters[rand.Next(0, renters.Count-1)];
             ViewBag.Home = home;
             ViewBag.Partial = "RenterCard";
             if (ajax == "true") return PartialView(ViewBag.Partial.ToString());
             return View("MainPage");
         }
 
+        [HttpPost]
         [Authorize(Roles = "Player")]
-        public IActionResult AcceptRenter(int id, int homeId, string ajax)
+        public IActionResult AcceptRenter(FormCollection col, string ajax)
         {
+            int id = 0;
+            int homeId = 0;
+            int.TryParse(Request.Form["renterId"], out id);
+            int.TryParse(Request.Form["homeId"], out homeId);
+            if (id == 0 || homeId == 0) return Content("error");
             var player = GetPlayer();
             var renter = _context.Renters.FirstOrDefault(m => m.RenterId == id);
             var home = _context.Homes.FirstOrDefault(m => m.HomeId == homeId);

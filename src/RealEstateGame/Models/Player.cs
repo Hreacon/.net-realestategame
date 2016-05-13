@@ -49,6 +49,24 @@ namespace RealEstateGame.Models
             Jobs.Add("Self Employed");
         }
 
+        [NotMapped]
+        public double RentalIncome
+        {
+            get
+            {
+                double rentalIncome = 0;
+                var renters = context.Renters.Where(m => m.PlayerId == PlayerId && m.Renting == 1).ToList();
+                if (renters.Any())
+                {
+                    foreach (var renter in renters)
+                    {
+                        rentalIncome += renter.Rent;
+                    }
+                }
+                return rentalIncome;
+            }
+        }
+
         public bool IsSelfEmployed()
         {
             return Job == Jobs[2];
@@ -107,6 +125,8 @@ namespace RealEstateGame.Models
                 
                 // add income
                 Money = Money + Income - Rent + RentalIncome;
+
+                // TODO: Renters randomly leave after term is up
 
                 // pay loans
                 var loans = GetLoans();
@@ -169,23 +189,6 @@ namespace RealEstateGame.Models
                     Revalue();
                 }
                 Save();
-            }
-        }
-
-        public double RentalIncome
-        {
-            get
-            {
-                double rentalIncome = 0;
-                var renters = context.Renters.Where(m => m.PlayerId == PlayerId && m.Renting == 1).ToList();
-                if (renters.Any())
-                {
-                    foreach (var renter in renters)
-                    {
-                        rentalIncome += renter.Rent;
-                    }
-                }
-                return rentalIncome;    
             }
         }
 
