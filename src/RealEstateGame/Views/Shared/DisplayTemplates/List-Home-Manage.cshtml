@@ -26,16 +26,19 @@
                 <button class="btn btn-success ajax" data-target="#rightside">Improve</button>
             }
         }
-        @using (Html.BeginForm("Move", "Home", FormMethod.Post))
-        {
-            <input type="hidden" name="homeId" value="@Model.HomeId" />
-            <button class="btn btn-default ajax" data-target="#rightside">Move Here</button>
-        }
         @using (Html.BeginForm("Sell", "Home", FormMethod.Post))
         {
             <input type="hidden" name="homeId" value="@Model.HomeId" />
             <button class="btn btn-danger ajax" data-target="#rightside">Sell This Home</button>
         }
-        <a href="/Home/RentHome/@Model.HomeId" class="btn btn-primary ajax" data-target="#rightside">Rent This Home</a>
+        @if (Model.Rented == 0)
+        {
+            using (Html.BeginForm("Move", "Home", FormMethod.Post))
+            {
+                <input type="hidden" name="homeId" value="@Model.HomeId" />
+                <button class="btn btn-default ajax" data-target="#rightside">Move Here</button>
+            }
+            <a href="/Home/RentHome/@Model.HomeId" class="btn btn-primary ajax" data-target="#rightside">Rent This Home</a>
+        }
     </div>
 </div>
