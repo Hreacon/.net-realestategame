@@ -10,7 +10,9 @@
 <p>Regular Mortgages require a 20% down payment. If you cannot afford this, try the FHA mortgage option.</p>
 <p>FHA Mortgages require 3.5% down and a condition of @Loan.FHACondition or greater.</p>
 
-<a href="/Loan/Apply" class="btn btn-success ajax" data-target="#rightside">Apply for a Loan</a>
+<a href="/Loan/Apply" class="btn btn-success widebtn ajax" data-target="#rightside">Apply for a Loan</a>
+<hr/>
+<h3>Make Extra Payments</h3>
 @if (loans != null)
 {
     using (Html.BeginForm("ExtraPayments", "Loan", FormMethod.Post))
@@ -19,6 +21,6 @@
         {
             @Html.DisplayFor(m=>loan, "List-Loan-Bank")
         }
-        <button class="btn btn-success ajax" data-target="#rightside">Make Extra Payments</button>
+        <button class="btn btn-success widebtn ajax" data-target="#rightside">Make Extra Payments</button>
     }
 }

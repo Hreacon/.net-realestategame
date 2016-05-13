@@ -106,3 +106,52 @@ textarea {
 .currentAPR {
     font-weight: bold;
 }
+
+.loan, .loanManage {
+    border: 1px solid black;
+    padding: 5px;
+    border-radius: 5px;
+    margin-bottom: 5px;
+    margin: auto;
+    margin-bottom: 5px;
+}
+    
+.loan {
+    width: 65%;
+}
+
+.loan div, .loanManage div {
+    display: inline-block;
+}
+
+.loancol1 {
+    width: 20%;
+}
+
+.loancol2 {
+    width: 45%;
+}
+
+.loancol3 {
+    width: 20%;
+    float: right;
+    margin-right: 5px;
+}
+
+.loanManage {
+    width: 90%;
+}
+
+.termcol {
+    width: 10%;
+}
+
+.principalcol {
+    width: 30%;
+}
+.paymentcol {
+    width: 15%;
+}
+.extrapaymentcol {
+    
+}

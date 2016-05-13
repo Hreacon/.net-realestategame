@@ -28,20 +28,19 @@
     }
 </div>
 <div class="loaninfo">
-    <div class="loanheader">
-        <div class="loancol1">Address:</div>
+    <div class="loan">
+        <div class="loancol1">Term</div>
         <div class="loancol2">Principal</div>
         <div class="loancol3">Payment</div>
-        <div class="loancol4">Term</div>
     </div>
     @if (loans != null)
     {
         foreach (var loan in loans)
         {
             <div class="loan">
+                <div class="loancol1">@loan.PaymentsLeft</div>
                 <div class="loancol2">@string.Format("{0:C}", loan.Principal)</div>
                 <div class="loancol3">@string.Format("{0:C}", loan.Payment)</div>
-                <div class="loancol4">@loan.PaymentsLeft</div>
             </div>
         }
     }
