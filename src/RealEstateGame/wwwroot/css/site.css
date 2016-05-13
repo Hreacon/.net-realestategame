@@ -56,6 +56,11 @@ textarea {
     font-size: 1.5em;
 }
 
+.managehomebuttons {
+    width: 100%;
+    margin-bottom: 5px;
+}
+
 .playername {
     text-align: center;
     font-weight: bold;
