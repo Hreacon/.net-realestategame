@@ -19,6 +19,7 @@ namespace RealEstateGame.Models
         public int ForSale  { get;set;}
         public int ForRent  { get;set;}
         public int Rented   { get;set;}
+        public virtual Renter renter { get; set; }
         public int Owned     { get; set; }
         // amount of rent gained per month
         public double Rent     { get;set;}

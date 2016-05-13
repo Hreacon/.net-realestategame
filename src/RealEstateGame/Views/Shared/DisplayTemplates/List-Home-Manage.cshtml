@@ -13,7 +13,7 @@
             }
             @if (Model.Rented == 1)
             {
-                <li>Rented</li>
+                <li>Rented for @string.Format("{0:C}", Model.renter.Rent)</li>
             }
         </ul>
     </div>
@@ -23,22 +23,22 @@
             using (Html.BeginForm("Improve", "Home", FormMethod.Post))
             {
                 <input type="hidden" name="homeId" value="@Model.HomeId"/>
-                <button class="btn btn-success ajax" data-target="#rightside">Improve</button>
+                <button class="btn btn-success managehomebuttons ajax" data-target="#rightside">Improve</button>
             }
         }
         @using (Html.BeginForm("Sell", "Home", FormMethod.Post))
         {
             <input type="hidden" name="homeId" value="@Model.HomeId" />
-            <button class="btn btn-danger ajax" data-target="#rightside">Sell This Home</button>
+            <button class="btn btn-danger managehomebuttons ajax" data-target="#rightside">Sell This Home</button>
         }
         @if (Model.Rented == 0)
         {
             using (Html.BeginForm("Move", "Home", FormMethod.Post))
             {
                 <input type="hidden" name="homeId" value="@Model.HomeId" />
-                <button class="btn btn-default ajax" data-target="#rightside">Move Here</button>
+                <button class="btn btn-default managehomebuttons ajax" data-target="#rightside">Move Here</button>
             }
-            <a href="/Home/RentHome/@Model.HomeId" class="btn btn-primary ajax" data-target="#rightside">Rent This Home</a>
+            <a href="/Home/RentHome/@Model.HomeId" class="btn btn-primary managehomebuttons ajax" data-target="#rightside">Rent This Home</a>
         }
     </div>
 </div>

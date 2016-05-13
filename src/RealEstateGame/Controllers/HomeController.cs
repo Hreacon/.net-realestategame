@@ -284,7 +284,7 @@ namespace RealEstateGame.Controllers
             var home = _context.Homes.First(m => m.HomeId == id);
             var rent = home.GetRent();
             Random rand = new Random();
-            var renters = _context.Renters.Where(m => m.PlayerId == player.PlayerId && m.Renting == 0 && m.Budget < rent).ToList();
+            var renters = _context.Renters.Where(m => m.PlayerId == player.PlayerId && m.Renting == 0 && m.Budget > rent).ToList();
             if (!renters.Any()) return Content("No Renters are available for this property.");
             // TODO: Make low damage renters pickier about their accomodations
             ViewBag.Renter = renters[rand.Next(0, renters.Count-1)];
@@ -308,6 +308,7 @@ namespace RealEstateGame.Controllers
             var home = _context.Homes.FirstOrDefault(m => m.HomeId == homeId);
             renter.Renting = 1;
             home.Rented = 1;
+            home.renter = renter;
             renter.Rent = home.GetRent();
             renter.HomeId = home.HomeId;
             renter.StartTurnNum = player.TurnNum;

@@ -416,7 +416,7 @@ namespace RealEstateGame.Models
         {
             if (HaveContext())
             {
-                return context.Homes.Where(m => m.PlayerId == PlayerId && m.Owned == 1);
+                return context.Homes.Where(m => m.PlayerId == PlayerId && m.Owned == 1).Include(m=>m.renter).ToList();
             }
             return null;
         }
