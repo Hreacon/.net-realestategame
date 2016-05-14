@@ -208,7 +208,7 @@ namespace RealEstateGame.Models
                     // every six months, a new home appears!
                     if (HaveContext())
                     {
-                        context.Homes.Add(Home.GenerateHome(PlayerId, rand));
+                        context.Homes.Add(Home.GenerateRandomHome(PlayerId, rand));
                         Save();
                     }
 

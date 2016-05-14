@@ -18,7 +18,7 @@ namespace RealEstateGameTests
         [Fact]
         public void HomeCanGenerate()
         {
-            var home = Home.GenerateHome(1, new Random());
+            var home = Home.GenerateRandomHome(1, new Random());
             Assert.Equal(1, home.PlayerId);
         }
     }
