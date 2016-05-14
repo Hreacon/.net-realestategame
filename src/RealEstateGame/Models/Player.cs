@@ -316,33 +316,21 @@ namespace RealEstateGame.Models
         {
             var home = GetHome(id);
             if (home.Owned == 0) return false;
-            bool cansell = true;
-            Loan loan = null;
-            // check to see if home has loan
-            var loans = GetLoans();
-            if (loans != null)
+            if (home.loan != null)
             {
-                foreach (var loanitem in loans)
-                {
-                    if (loanitem.HomeId == home.HomeId)
-                    {
-                        // home has a loan.
-                        if (loanitem.Principal > home.Value || loanitem.LoanType == 1 && TurnNum - loanitem.StartTurnNum < 12) cansell = false;
-                        else loan = loanitem;
-                    }
-                }
+                if (home.loan.Principal > home.Value || home.loan.LoanType == 1 && TurnNum - home.loan.StartTurnNum < 12) return false;    
             }
-            if (!cansell) return false;
+            
             if (Address == home.Address)
             {
                 // player lives in house, they sell the home they move into an apartment
                 MoveIntoApartment();
             }
             Money = Money + home.Value;
-            if (loan != null)
+            if (home.loan != null)
             {
-                Money = Money - loan.Principal;
-                context.Remove(loan);
+                Money = Money - home.loan.Principal;
+                context.Remove(home.loan);
             }
             home.Owned = 0;
             home.ForSale = 1;
@@ -470,7 +458,7 @@ namespace RealEstateGame.Models
         {
             if (HaveContext())
             {
-                return context.Homes.FirstOrDefault(m => m.HomeId == id);
+                return context.Homes.Include(m=>m.loan).Include(m=>m.renter).FirstOrDefault(m => m.HomeId == id);
             }
             return null;
         }
