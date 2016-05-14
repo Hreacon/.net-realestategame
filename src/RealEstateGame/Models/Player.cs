@@ -302,6 +302,7 @@ namespace RealEstateGame.Models
             if (home.Asking < Money)
             {
                 Money = Money - home.Asking;
+                UseAction();
                 home.Owned = 1;
                 home.ForSale = 0;
                 AddTransaction(new Transaction(PlayerId, home.HomeId, TurnNum, home.Asking));
@@ -354,6 +355,7 @@ namespace RealEstateGame.Models
                 context.Update(renter);
             }
             home.Asking = home.Value + home.Value/10;
+            UseAction();
             // TODO make this more realistic
             AddTransaction(new Transaction(PlayerId, home.HomeId, TurnNum, home.Value));
             SavePlayerAndHome(home);

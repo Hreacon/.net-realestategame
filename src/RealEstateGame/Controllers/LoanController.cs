@@ -36,15 +36,15 @@ namespace RealEstateGame.Controllers
         }
 
         [NonAction]
-        public double GetAPR()
+        public static double GetAPR()
         {
-            return .035;
+            return Loan.APR;
         }
 
         [NonAction]
-        public double GetFHAAPR()
+        public static double GetFHAAPR()
         {
-            return GetAPR() + .03;
+            return Loan.FHAAPR;
         }
 
         // GET: /<controller>/
@@ -112,6 +112,7 @@ namespace RealEstateGame.Controllers
                     var loan = _context.Loans.Add(new Loan(player.PlayerId, home.Asking - home.GetDownPayment(), GetAPR(), 360,
                         player.TurnNum, home)).Entity;
                     home.loan = loan;
+                    player.UseAction();
                     player.SavePlayerAndHome(home);
                     return RedirectToAction("Index", "Home", new {ajax=ajax});
                 }
@@ -154,6 +155,7 @@ namespace RealEstateGame.Controllers
                     var loan = _context.Loans.Add(new Loan(player.PlayerId, home.Asking - home.GetFHADownPayment(), GetAPR(), 360,
                         player.TurnNum, home, 1)).Entity;
                     home.loan = loan;
+                    player.UseAction();
                     player.SavePlayerAndHome(home);
                     return RedirectToAction("Index", "Home", new {ajax=ajax});
                 }

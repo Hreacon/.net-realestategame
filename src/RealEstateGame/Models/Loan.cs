@@ -15,13 +15,15 @@ namespace RealEstateGame.Models
         [ForeignKey("Home")]
         public int HomeId { get; set; }
         public double Principal { get; set; }
-        public double APR { get; set; }
         public int Term { get; set; }
         public double Payment { get; set; }
         public int StartTurnNum { get; set; }
         public int PaymentsLeft { get; set; }
         public int LoanType { get; set; } // 0 for regular, 1 for fha
 
+
+        [NotMapped] public static double APR = .035;
+        [NotMapped] public static double FHAAPR = APR + .03;
         [NotMapped] public static int FHACondition = 7;
 
         public Loan(int playerId, double principal, double apr, int term, int startTurnNum, Home inhome, int loanType = 0)

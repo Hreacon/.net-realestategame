@@ -184,6 +184,7 @@ namespace RealEstateGame.Controllers
             var success = player.ImproveHome(id);
             if (success)
             {
+
                 ViewBag.Player = player;
                 if (ajax == "true")
                 {
