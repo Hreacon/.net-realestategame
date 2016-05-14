@@ -152,7 +152,7 @@ namespace RealEstateGame.Controllers
                     if(home.Condition < Loan.FHACondition) home.ImproveToCondition(Loan.FHACondition);
                     home.Owned = 1;
                     player.MoveIntoHome(home);
-                    var loan = _context.Loans.Add(new Loan(player.PlayerId, home.Asking - home.GetFHADownPayment(), GetAPR(), 360,
+                    var loan = _context.Loans.Add(new Loan(player.PlayerId, home.Asking - home.GetFHADownPayment(), Loan.FHAAPR, 360,
                         player.TurnNum, home, 1)).Entity;
                     home.loan = loan;
                     player.UseAction();
