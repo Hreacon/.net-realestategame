@@ -110,7 +110,7 @@ function ajaxInit() {
                     var money = Number($("#money").text());
                     slidertotal = setSliderTotal(this);
                     if (slider > money - slidertotal) {
-                        slider = money-slidertotal;
+                        slider = money - slidertotal;
                         $(this).val(money-slidertotal);
                     }
                     var val = '$' + parseFloat(slider, 10).toFixed(2).replace(/(\d)(?=(\d{3})+\.)/g, "$1,");

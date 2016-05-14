@@ -147,9 +147,26 @@ namespace RealEstateGame.Models
                 
                 // add income
                 Money = Money + Income - Rent + RentalIncome;
-
-                // TODO: Renters randomly leave after term is up
-
+                
+                var renters = context.Renters.Where(m => m.PlayerId == PlayerId && m.Renting == 1).ToList();
+                if (renters.Any())
+                {
+                    foreach (var renter in renters)
+                    {
+                        // if term is over
+                        // TODO make renters damage homes randomly
+                        // Remember that homes have twice as much chance every 6 mo to lose condition
+                        // TODO make renters leave homes that have degraded past the renters allowable limits
+                        if (renter.StartTurnNum + Renter.Term > TurnNum)
+                        {
+                            if (Randomly(200, rand))
+                            {
+                                var home = GetHome(renter.HomeId);
+                                RemoveRenter(home);
+                            }
+                        }
+                    }
+                }
                 // pay loans
                 var loans = GetLoans();
                 if (loans != null)
@@ -197,11 +214,11 @@ namespace RealEstateGame.Models
 
 
                     // every six months, chance of home loosing condition point!
-                    int chance = 10;
+                    int chance = 30;
                     foreach (var home in GetOwnedHomes())
                     {
                         var inchance = chance;
-                        if (home.Rented == 1) inchance = inchance*2;
+                        if (home.Rented == 1) inchance = inchance/2;
                         if (Randomly(inchance, rand))
                         {
                             home.Degrade(rand);
@@ -466,6 +483,18 @@ namespace RealEstateGame.Models
             var loans = context.Loans.Where(m => m.PlayerId == PlayerId).ToList();
             if (loans.Any()) return loans;
             else return null;
+        }
+
+        public void RemoveRenter(Home home)
+        {
+            var renter = home.renter;
+
+            home.renter = null;
+            renter.Renting = 0;
+            renter.HomeId = 0;
+            home.Rented = 0;
+            context.Renters.Update(renter);
+            SavePlayerAndHome(home);
         }
     }
 }

@@ -354,13 +354,8 @@ namespace RealEstateGame.Controllers
             
             var renter = home.renter;
             if (!(player.TurnNum > renter.StartTurnNum + Renter.Term)) return Content("Rental term isn't up yet");
-            home.renter = null;
-            renter.Renting = 0;
-            renter.HomeId = 0;
-            home.Rented = 0;
-            _context.Homes.Update(home);
-            _context.Renters.Update(renter);
-            _context.SaveChanges();
+
+            player.RemoveRenter(home);
             return RedirectToAction("Portfolio", new {ajax = ajax});
         }
     }
