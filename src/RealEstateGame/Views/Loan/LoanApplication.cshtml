@@ -39,7 +39,7 @@
     @using (Html.BeginForm("RegularLoanApplication", "Loan", FormMethod.Post))
     {
         <input type="hidden" name="homeId" value="@home.HomeId"/>
-        <button class="btn btn-success ajax" data-target="#rightside">Apply For Loan</button>
+        <button class="btn btn-success widebtn ajax" data-target="#rightside">Apply For Regular Loan</button>
     }
 </div>
 <div>
@@ -56,6 +56,8 @@
     @using (Html.BeginForm("FHALoanApplication", "Loan", FormMethod.Post))
     {
         <input type="hidden" name="homeId" value="@home.HomeId" />
-        <button class="btn btn-success ajax" data-target="#rightside">Apply For Loan</button>
+        <button class="btn btn-success widebtn ajax" data-target="#rightside">Apply For FHA Loan</button>
     }
+    <div><a href="/Loan/Apply#@home.HomeId" class="btn btn-danger widebtn ajax" data-target="#rightside">Back To List</a></div>
+
 </div>
