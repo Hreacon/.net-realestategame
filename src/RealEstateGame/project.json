@@ -25,6 +25,7 @@
     "Microsoft.Extensions.Logging.Console": "1.0.0-rc1-final",
     "Microsoft.Extensions.Logging.Debug": "1.0.0-rc1-final",
     "Microsoft.VisualStudio.Web.BrowserLink.Loader": "14.0.0-rc1-final",
+    "RestSharp": "105.2.3",
     "System.Collections.Immutable": "1.1.37",
     "System.Linq": "4.0.1-beta-23516"
   },
