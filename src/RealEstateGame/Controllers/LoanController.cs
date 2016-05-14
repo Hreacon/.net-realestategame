@@ -41,6 +41,12 @@ namespace RealEstateGame.Controllers
             return .035;
         }
 
+        [NonAction]
+        public double GetFHAAPR()
+        {
+            return GetAPR() + .03;
+        }
+
         // GET: /<controller>/
         public IActionResult Index(string ajax)
         {
@@ -59,9 +65,9 @@ namespace RealEstateGame.Controllers
             // Players income is listed income + rentals - expenses, namely mortgages. In the future mortgage payments also come out.
             // TODO calculate total mortgage payments and deduct from income
             // TODO calculate collected rent and add to income
-            var income = player.Income;
+            var income = player.NetPerTurn;
             // current interest rate.. held ??? currently static @ 4.5%
-            var currentAPR = .045;
+            var currentAPR = GetAPR();
             var principal = Loan.CalculateAffordableAmount(income, currentAPR, 360);
             ViewData["principal"] = principal;
             ViewData["partial"] = "Apply";
@@ -98,10 +104,10 @@ namespace RealEstateGame.Controllers
             if (homeId > 0)
             {
                 var home = _context.Homes.FirstOrDefault(m => m.HomeId == homeId);
-                if (player.Money > home.Asking*.2)
+                if (player.Money > home.GetDownPayment())
                 {
                     // player can afford loan
-                    player.Money = player.Money - home.Asking*.2;
+                    player.Money = player.Money - home.GetDownPayment();
                     home.Owned = 1;
                     var loan = _context.Loans.Add(new Loan(player.PlayerId, home.Asking - home.GetDownPayment(), GetAPR(), 360,
                         player.TurnNum, home)).Entity;
@@ -138,11 +144,11 @@ namespace RealEstateGame.Controllers
             {
                 var home = _context.Homes.FirstOrDefault(m => m.HomeId == homeId);
                 var totalCost = home.GetFHADownPayment();
-                if (home.Condition < 7) totalCost += home.CostToCondition(Loan.FHACondition);
+                if (home.Condition < Loan.FHACondition) totalCost += home.CostToCondition(Loan.FHACondition);
                 if (player.Money > totalCost)
                 {
                     player.Money = player.Money - totalCost;
-                    if(home.Condition < 7 ) home.ImproveToCondition(Loan.FHACondition);
+                    if(home.Condition < Loan.FHACondition) home.ImproveToCondition(Loan.FHACondition);
                     home.Owned = 1;
                     player.MoveIntoHome(home);
                     var loan = _context.Loans.Add(new Loan(player.PlayerId, home.Asking - home.GetFHADownPayment(), GetAPR(), 360,
@@ -165,7 +171,7 @@ namespace RealEstateGame.Controllers
                 foreach (var loan in loans)
                 {
                     var extrapayment = double.Parse(Request.Form[loan.LoanId.ToString()]); 
-                    if (!(player.Money > extrapayment) || !(extrapayment > 0)) continue; // continue jumps to next iteration of loop
+                    if (!(player.Money+0.01 > extrapayment) || !(extrapayment > 0)) continue; // continue jumps to next iteration of loop
                     if (extrapayment > loan.Principal)
                     {
                         extrapayment = loan.Principal;

@@ -10,6 +10,7 @@
         @player.Username
         <hr/>
     </div>
+    <div style="display: none;" id="money">@player.Money</div>
     <div class="playertitle">@Html.DisplayNameFor(m => player.Money)</div><div class="playervalue">@string.Format("{0:C}", player.Money)</div>
     <div class="playertitle">@Html.DisplayNameFor(m => player.Income)</div><div class="playervalue">@string.Format("{0:C}", player.Income)</div>
     <div class="playertitle">@Html.DisplayNameFor(m => player.Job)</div><div class="playervalue">@player.Job</div>

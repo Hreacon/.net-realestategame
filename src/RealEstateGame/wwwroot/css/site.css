@@ -152,6 +152,10 @@ textarea {
 .paymentcol {
     width: 15%;
 }
-.extrapaymentcol {
-    
+.extrapaymentcol, .slideroutput {
+    width: 40%;
+}
+
+.slideroutput {
+    text-align: center;
 }

@@ -83,6 +83,12 @@ namespace RealEstateGame.Models
             }
         }
 
+        [NotMapped]
+        public double NetPerTurn
+        {
+            get { return Income - Rent + RentalIncome - LoanPayments; }
+        }
+
         public bool IsSelfEmployed()
         {
             return Job == Jobs[2];

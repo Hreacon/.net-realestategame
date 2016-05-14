@@ -35,7 +35,7 @@ function ajaxPost(form, target) {
         success: function(result) {
             ajaxReturn(target, result, '');
         }
-});
+    });
 }
 function ajaxReturn(target, result, tag) {
     console.log("post success");
@@ -43,7 +43,7 @@ function ajaxReturn(target, result, tag) {
         $(target).html(result);
         updatePlayer();
         ajaxInit();
-        if (tag.length > 0) {
+        if (tag.length > 1) {
             console.log('scroll');
             $(window).scrollTop($(tag).offset().top-100);
         } else {
@@ -96,6 +96,37 @@ function ajaxInit() {
             ajaxPost(this, button.attr("data-target"));
             return false;
         });
+    var slidertotal = 0;
+    $("input[type=range]")
+        .each(function () {
+            $(this).on('mousemove', function () {
+                    var slider = Number($(this).val());
+                    console.log(slider, money, slidertotal);
+                    var val = '$' + parseFloat(slider, 10).toFixed(2).replace(/(\d)(?=(\d{3})+\.)/g, "$1,");
+                    var tget = "output" + $(this).attr('id');
+                    $("#"+tget).html(val);
+                }).on('change',function() {
+                    var slider = Number($(this).val());
+                    var money = Number($("#money").text());
+                    slidertotal = setSliderTotal(this);
+                    if (slider > money - slidertotal) {
+                        slider = money-slidertotal;
+                        $(this).val(money-slidertotal);
+                    }
+                    var val = '$' + parseFloat(slider, 10).toFixed(2).replace(/(\d)(?=(\d{3})+\.)/g, "$1,");
+                    var tget = "output" + $(this).attr('id');
+                    $("#" + tget).html(val);
+            });
+        });
+}
+function setSliderTotal(except) {
+    var total = 0;
+    $("input[type=range]")
+        .each(function () {
+            if(!(this == except))
+                total += Number($(this).val());
+        });
+    return total;
 }
 $(document)
     .ready(function () {
