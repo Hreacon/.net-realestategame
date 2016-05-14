@@ -33,7 +33,7 @@ function ajaxPost(form, target) {
         url: href,
         data: $(form).serialize(),
         success: function(result) {
-            ajaxReturn(target, result, '');
+            ajaxReturn(target, result, 'no');
         }
     });
 }
@@ -43,10 +43,10 @@ function ajaxReturn(target, result, tag) {
         $(target).html(result);
         updatePlayer();
         ajaxInit();
-        if (tag.length > 1) {
+        if (tag.length > 1 && tag != "no") {
             console.log('scroll');
             $(window).scrollTop($(tag).offset().top-100);
-        } else {
+        } else if(tag != "no") {
             $(window).scrollTop(0);
         }
     } else message(result);
