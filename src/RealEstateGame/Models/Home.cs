@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
+using RestSharp;
 
 namespace RealEstateGame.Models
 {
@@ -29,18 +30,100 @@ namespace RealEstateGame.Models
         // 0 is broken 10 is fully upgraded
         public int Condition { get;set;}
 
-        public static HashSet<Home> GenerateHomes(int playerId, int amount = 30)
+        public static List<Home> GenerateHomes(int playerId, int amount = 30)
         {
-            HashSet<Home> output = new HashSet<Home>();
+            var zws_id = "X1-ZWz1f9dgwvdq8b_44w9p";
+            var client = new RestClient("http://www.zillo.com/webservice/");
+            var baseRequestUri = "GetDeepComps.htm?zws-id=" + zws_id + "&count=25&zpid=";
             Random rand = new Random();
-            for (var i = 0; i < amount; i++)
+            List<string> zids = new List<string>();
+            zids.Add("33567706");
+            zids.Add("14494167");
+            zids.Add("53845195");
+            zids.Add("53932054");
+            zids.Add("53953387");
+            List<Home> output = new List<Home>();
+            foreach (var zid in zids)
             {
-                output.Add(Home.GenerateHome(playerId, rand));
+                var req = new RestRequest(baseRequestUri + zid);
+                var response = client.Execute(req);
+                if (response.Content.Contains("Request successfully processed"))
+                    output.AddRange(ParseZillowResponse(playerId, response.Content, rand));
+            }
+            if (output.Count < 50)
+            {
+                for (var i = 0; i < amount; i++)
+                {
+                    output.Add(Home.GenerateRandomHome(playerId, rand));
+                }
             }
             return output;
         }
 
-        public static Home GenerateHome(int playerId, Random rand)
+        private static IEnumerable<Home> ParseZillowResponse(int playerId, string xml, Random rand = null)
+        {
+            if(rand == null) rand = new Random();
+            // Get the original house
+            var tag = "principal";
+            List<Home> output = new List<Home>();
+            output.Add(GetHomeFromZillowXml(GetCodeSection(xml, GetOpen(tag), GetClose(tag)), playerId, rand));
+            xml = CutCode(xml, GetClose(tag));
+            tag = "comp";
+            List<string> xmlHomes = new List<string>();
+            // Get the comps sections
+            while (xml.IndexOf(GetClose(tag)) > 0)
+            {
+                xmlHomes.Add(GetCodeSection(xml, GetClose(tag)));
+                xml = CutCode(xml, GetClose(tag));
+            }
+
+            // loop through comps 
+            foreach (var xmlHome in xmlHomes)
+            {
+                output.Add(GetHomeFromZillowXml(xmlHome, playerId, rand));
+            }
+            return output;
+        }
+
+        private static Home GetHomeFromZillowXml(string xml, int playerId, Random rand)
+        {
+            var tag = "street";
+            var address = GetCodeSection(xml, GetOpen(tag), GetClose(tag));
+            var valueString = GetCodeSection(xml, GetOpen("amount currency=\"USD\""), GetClose("amount"));
+            double value = 0;
+            double.TryParse(valueString, out value);
+            return MakeHome(address, value, playerId, rand);
+            // generate home
+        }
+
+        private static string GetOpen(string tag)
+        {
+            return "<"+tag+">";
+        }
+
+        private static string GetClose(string tag)
+        {
+            return GetOpen("/"+tag);
+        }
+
+        private static string GetCodeSection(string code, string start, string end)
+        {
+            var indexStart = code.IndexOf(start) + start.Length;
+            var length = code.IndexOf(end, indexStart) - indexStart;
+            return code.Substring(indexStart, length);
+        }
+
+        private static string GetCodeSection(string code, string find)
+        {
+            return code.Contains(find) ? code.Substring(0, code.IndexOf(find)) : code;
+        }
+
+        private static string CutCode(string code, string cut)
+        {
+            return code.Substring(code.IndexOf(cut) + cut.Length);
+        }
+
+        public static Home GenerateRandomHome(int playerId, Random rand)
         {
             int homeNum = rand.Next(1000, 40000);
             string Street = "MX-5 Drive";
@@ -56,18 +139,24 @@ namespace RealEstateGame.Models
             int Condition = rand.Next(10, 20);
             int Value = 50000 + homeNum*Condition;
             if (homeNum > 30000) Value = Value*2 - Value/2;
-            Condition = Condition/2;
+            return MakeHome(Address, Value, playerId, rand);
+        }
+
+        public static Home MakeHome(string address, double value, int playerId, Random rand)
+        {
+            if (rand == null) rand = new Random();
+            int condition = rand.Next(1, 10);
             return new Home()
             {
-                Address = Address,
-                Value = Value,
+                Address = address,
+                Value = value,
                 PlayerId = playerId,
                 ForSale = 1,
                 ForRent = 0,
                 Rented = 0,
                 Rent = 0,
-                Asking = Value,
-                Condition = Condition,
+                Asking = value,
+                Condition = condition,
                 Owned = 0
             };
         }
