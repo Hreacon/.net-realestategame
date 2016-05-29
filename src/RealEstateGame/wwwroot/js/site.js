@@ -138,4 +138,3 @@ $(document)
                 player.css('margin-top', window.pageYOffset);
         });
     });
-

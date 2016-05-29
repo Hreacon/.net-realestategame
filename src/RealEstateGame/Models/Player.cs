@@ -318,7 +318,7 @@ namespace RealEstateGame.Models
             if (home.Owned == 0) return false;
             if (home.loan != null)
             {
-                if (home.loan.Principal > home.Value || home.loan.LoanType == 1 && TurnNum - home.loan.StartTurnNum < 12) return false;    
+                if (home.loan.Principal > home.Value || home.loan.LoanType == 1 && TurnNum - home.loan.StartTurnNum < Loan.DEFAULT_TERM) return false;    
             }
             
             if (Address == home.Address)
@@ -330,7 +330,7 @@ namespace RealEstateGame.Models
             if (home.loan != null)
             {
                 Money = Money - home.loan.Principal;
-                context.Remove(home.loan);
+                context.Loans.Remove(home.loan);
             }
             home.Owned = 0;
             home.ForSale = 1;

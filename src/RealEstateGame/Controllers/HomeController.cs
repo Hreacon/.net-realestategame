@@ -283,13 +283,31 @@ namespace RealEstateGame.Controllers
         public IActionResult RentHome(int id, string ajax)
         {
             var player = GetPlayer();
-            var home = _context.Homes.First(m => m.HomeId == id);
+            var home = player.GetHome(id);
+            if (home.Condition < 3) return Content("This home is in no shape to rent out");
             if (home.Address == player.Address) return Content("You live here");
             var rent = home.GetRent();
             Random rand = new Random();
             var renters = _context.Renters.Where(m => m.PlayerId == player.PlayerId && m.Renting == 0 && m.Budget > rent).ToList();
-            if (!renters.Any()) return Content("No Renters are available for this property.");
-            // TODO: Make low damage renters pickier about their accomodations
+            if (renters.Any())
+            {
+                if (home.Condition < 5)
+                {
+                    var notRenting = new List<Renter>();
+                    foreach (var renter in renters)
+                    {
+                        if (renter.Damage < 3)
+                        {
+                            notRenting.Add(renter);
+                        }
+                    }
+                    foreach (var renter in notRenting)
+                    {
+                        renters.Remove(renter);
+                    }
+                }
+            }
+            if (!renters.Any()) return Content("No Renters are interested in this property.");
             ViewBag.Renter = renters[rand.Next(0, renters.Count-1)];
             ViewBag.Home = home;
             ViewBag.Partial = "RenterCard";
@@ -309,7 +327,7 @@ namespace RealEstateGame.Controllers
             if (id == 0 || homeId == 0) return Content("error");
             var player = GetPlayer();
             var renter = _context.Renters.FirstOrDefault(m => m.RenterId == id);
-            var home = _context.Homes.FirstOrDefault(m => m.HomeId == homeId);
+            var home = player.GetHome(id);
             renter.Renting = 1;
             home.Rented = 1;
             home.renter = renter;
@@ -351,7 +369,7 @@ namespace RealEstateGame.Controllers
             int homeId = 0;
             int.TryParse(Request.Form["homeId"], out homeId);
             if (homeId == 0) return Content("Error");
-            var home = _context.Homes.Include(m=>m.renter).FirstOrDefault(m => m.HomeId == homeId);
+            var home = player.GetHome(homeId);
             
             var renter = home.renter;
             if (!(player.TurnNum > renter.StartTurnNum + Renter.Term)) return Content("Rental term isn't up yet");
