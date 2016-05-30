@@ -148,59 +148,56 @@ namespace RealEstateGame.Models
                 // add income
                 Money = Money + Income - Rent + RentalIncome;
                 
-                var renters = context.Renters.Where(m => m.PlayerId == PlayerId && m.Renting == 1).ToList();
-                if (renters.Any())
+                var homes = GetOwnedHomes();
+                foreach (var home in homes)
                 {
-                    foreach (var renter in renters)
+                    // if home has a loan
+                    if (home.loan != null)
                     {
-                        // if term is over
+                        // and player can pay for loan
+                        if (Money > home.loan.Payment)
+                        {
+                            home.loan.MakePayment();
+                            if (home.loan.Principal <= home.loan.Payment+1)
+                            {
+                                // pay only whats left on the mortgage, not the full thing
+                                Money = Money - home.loan.Principal;
+                                context.Loans.Remove(home.loan);
+                                home.loan = null;
+                            }
+                            else
+                            {
+                                Money = Money - home.loan.Payment;
+                                context.Loans.Update(home.loan);
+                            }
+                        }
+                        else
+                        {
+                            // TODO player cant pay loans
+                        }
+                    }
+
+                    // if home has renter
+                    if (home.renter != null)
+                    {
                         // TODO make renters damage homes randomly
                         // Remember that homes have twice as much chance every 6 mo to lose condition
                         // TODO make renters leave homes that have degraded past the renters allowable limits
-                        if (renter.StartTurnNum + Renter.Term > TurnNum)
+                        if (home.renter.StartTurnNum + Renter.Term > TurnNum)
                         {
-                            if (Randomly(200, rand))
+                            if (Randomly(200, rand) || (home.Rent *.9 > home.GetRent() && TurnNum >= home.renter.StartTurnNum + Renter.Term))
                             {
-                                var home = GetHome(renter.HomeId);
                                 RemoveRenter(home);
                             }
                         }
                     }
-                }
-                // pay loans
-                var loans = GetLoans();
-                if (loans != null)
-                {
-                    foreach (var loan in loans)
+
+                    // home randomly changes for sale status
+                    if (Randomly(250, rand))
                     {
-                        if (Money > loan.Payment)
-                        {
-                            if (loan.Payment > loan.Principal) loan.Payment = loan.Principal+10;
-                            loan.MakePayment();
-                            Money = Money - loan.Payment;
-                            if (loan.Principal <= 0)
-                            {
-                                context.Homes.FirstOrDefault(m => m.HomeId == loan.HomeId).loan = null;
-                                context.Loans.Remove(loan);
-                            }
-                            else context.Loans.Update(loan);
-                        }
-                        // TODO else they lose?
+                        home.ForSale = home.ForSale == 1 ? 0 : 1;
                     }
                 }
-
-                // randomly houses change for sale status
-                if (HaveContext())
-                {
-                    foreach (var home in context.Homes.Where(m => m.PlayerId == PlayerId && m.Owned == 0).ToList())
-                    {
-                        if (Randomly(250, rand))
-                        {
-                            home.ForSale = home.ForSale == 1 ? 0 : 1;
-                        }
-                    }
-                }
-
                 // Incriment Turn Number
                 TurnNum++;
                 if (TurnNum%6 == 0)

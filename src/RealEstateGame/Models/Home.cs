@@ -30,19 +30,20 @@ namespace RealEstateGame.Models
         // 0 is broken 10 is fully upgraded
         public int Condition { get;set;}
 
-        public static List<Home> GenerateHomes(int playerId, int amount = 30)
+        public static List<Home> GenerateHomes(int playerId, int amount = 50)
         {
+            List<Home> output = new List<Home>();
+            Random rand = new Random();
+            /*
             var zws_id = "X1-ZWz1f9dgwvdq8b_44w9p";
             var client = new RestClient("http://www.zillo.com/webservice/");
             var baseRequestUri = "GetDeepComps.htm?zws-id=" + zws_id + "&count=25&zpid=";
-            Random rand = new Random();
             List<string> zids = new List<string>();
             zids.Add("33567706");
             zids.Add("14494167");
             zids.Add("53845195");
             zids.Add("53932054");
             zids.Add("53953387");
-            List<Home> output = new List<Home>();
             foreach (var zid in zids)
             {
                 var req = new RestRequest(baseRequestUri + zid);
@@ -50,6 +51,7 @@ namespace RealEstateGame.Models
                 if (response.Content.Contains("Request successfully processed"))
                     output.AddRange(ParseZillowResponse(playerId, response.Content, rand));
             }
+            */
             if (output.Count < 50)
             {
                 for (var i = 0; i < amount; i++)
@@ -151,7 +153,7 @@ namespace RealEstateGame.Models
                 Address = address,
                 Value = value,
                 PlayerId = playerId,
-                ForSale = 1,
+                ForSale = rand.Next(0,1),
                 ForRent = 0,
                 Rented = 0,
                 Rent = 0,

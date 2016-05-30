@@ -6,6 +6,10 @@
     <div class="col-sm-7">
         <ul>
             <li>Value: @string.Format("{0:C0}", Model.Value)</li>
+            @if (Model.loan != null)
+            {
+                <li>Loan Principal: @string.Format("{0:C}", Model.loan.Principal)</li>
+            }
             <li>Condition: @Model.Condition</li>
             @if(Model.Condition < 10) {
                 <li>Cost to Improve: @string.Format("{0:C}", Model.GetCostImprovement())</li>
