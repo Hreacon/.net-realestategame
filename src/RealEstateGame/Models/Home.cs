@@ -148,12 +148,14 @@ namespace RealEstateGame.Models
         {
             if (rand == null) rand = new Random();
             int condition = rand.Next(1, 10);
+            int ForSale = 0;
+            if (rand.Next(100) > 40) ForSale = 1;
             return new Home()
             {
                 Address = address,
                 Value = value,
                 PlayerId = playerId,
-                ForSale = rand.Next(0,1),
+                ForSale = ForSale,
                 ForRent = 0,
                 Rented = 0,
                 Rent = 0,

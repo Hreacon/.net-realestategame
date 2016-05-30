@@ -327,7 +327,7 @@ namespace RealEstateGame.Controllers
             if (id == 0 || homeId == 0) return Content("error");
             var player = GetPlayer();
             var renter = _context.Renters.FirstOrDefault(m => m.RenterId == id);
-            var home = player.GetHome(id);
+            var home = player.GetHome(homeId);
             renter.Renting = 1;
             home.Rented = 1;
             home.renter = renter;

@@ -21,9 +21,9 @@ namespace RealEstateGame.Models
         public int PaymentsLeft { get; set; }
         public int LoanType { get; set; } // 0 for regular, 1 for fha
 
-        public static int TYPE_REGULAR = 0;
-        public static int TYPE_FHA = 1;
-        public static int DEFAULT_TERM = 12;
+        public const int TYPE_REGULAR = 0;
+        public const int TYPE_FHA = 1;
+        public const int DEFAULT_TERM = 12;
 
         [NotMapped] public static double APR = .035;
         [NotMapped] public static double FHAAPR = APR + .03;
@@ -46,6 +46,18 @@ namespace RealEstateGame.Models
 
         public Loan()
         {
+        }
+
+        public string GetLoanType()
+        {
+            switch (LoanType)
+            {
+                case TYPE_REGULAR:
+                    return "Reg";
+                case TYPE_FHA:
+                    return "FHA";
+            }
+            return "Not Found";
         }
 
         public void MakePayment()

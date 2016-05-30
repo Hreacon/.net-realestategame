@@ -143,11 +143,13 @@ textarea {
 }
 
 .termcol {
-    width: 10%;
+    width: 8%;
 }
-
+.typecol {
+    width: 8%;
+}
 .principalcol {
-    width: 30%;
+    width: 20%;
 }
 .paymentcol {
     width: 15%;

@@ -1,8 +1,11 @@
 ﻿@model Loan
 
 <div class="loanManage">
+    <div class="typecol">@Model.GetLoanType()</div>
     <div class="termcol">@Model.PaymentsLeft</div>
     <div class="principalcol">@string.Format("{0:C}", Model.Principal)</div>
     <div class="paymentcol">@string.Format("{0:C}", Model.Payment)</div>
-    <div class="extrapaymentcol"><input type="range" value="0" step=".01" min="0" max="@string.Format("{0:F}", Model.Principal)" id="@string.Format("slider{0}",Model.LoanId)" name="@Model.LoanId"/><div class="slideroutput" id="@string.Format("outputslider{0}", Model.LoanId)">$0.00</div></div>
+    <div class="extrapaymentcol"><input type="range" value="0" step=".01" min="0" max="@string.Format("{0:F}", Model.Principal)" id="@string.Format("slider{0}", Model.LoanId)" name="@Model.LoanId"/>
+        <div class="slideroutput" id="@string.Format("outputslider{0}", Model.LoanId)">$0.00</div>
+    </div>
 </div>

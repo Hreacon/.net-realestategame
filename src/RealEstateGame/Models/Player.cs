@@ -157,17 +157,18 @@ namespace RealEstateGame.Models
                         // and player can pay for loan
                         if (Money > home.loan.Payment)
                         {
-                            home.loan.MakePayment();
                             if (home.loan.Principal <= home.loan.Payment+1)
                             {
                                 // pay only whats left on the mortgage, not the full thing
                                 Money = Money - home.loan.Principal;
+                                home.loan.MakePayment();
                                 context.Loans.Remove(home.loan);
                                 home.loan = null;
                             }
                             else
                             {
                                 Money = Money - home.loan.Payment;
+                                home.loan.MakePayment();
                                 context.Loans.Update(home.loan);
                             }
                         }
@@ -185,19 +186,24 @@ namespace RealEstateGame.Models
                         // TODO make renters leave homes that have degraded past the renters allowable limits
                         if (home.renter.StartTurnNum + Renter.Term > TurnNum)
                         {
-                            if (Randomly(200, rand) || (home.Rent *.9 > home.GetRent() && TurnNum >= home.renter.StartTurnNum + Renter.Term))
+                            if (Randomly(200, rand) || home.Rent *.9 > home.GetRent())
                             {
                                 RemoveRenter(home);
                             }
                         }
                     }
+                }
 
+                // not owned homes change for sale status
+                foreach (var home in context.Homes.Where(m => m.PlayerId == PlayerId && m.Owned == 0))
+                {
                     // home randomly changes for sale status
-                    if (Randomly(250, rand))
+                    if (Randomly(25, rand))
                     {
                         home.ForSale = home.ForSale == 1 ? 0 : 1;
                     }
                 }
+
                 // Incriment Turn Number
                 TurnNum++;
                 if (TurnNum%6 == 0)
@@ -214,9 +220,7 @@ namespace RealEstateGame.Models
                     int chance = 30;
                     foreach (var home in GetOwnedHomes())
                     {
-                        var inchance = chance;
-                        if (home.Rented == 1) inchance = inchance/2;
-                        if (Randomly(inchance, rand))
+                        if (Randomly(chance, rand))
                         {
                             home.Degrade(rand);
                             context.Homes.Update(home);
@@ -315,30 +319,39 @@ namespace RealEstateGame.Models
             if (home.Owned == 0) return false;
             if (home.loan != null)
             {
-                if (home.loan.Principal > home.Value || home.loan.LoanType == 1 && TurnNum - home.loan.StartTurnNum < Loan.DEFAULT_TERM) return false;    
+                if (home.loan.Principal > home.Value || home.loan.LoanType == Loan.TYPE_FHA && TurnNum - home.loan.StartTurnNum < Loan.DEFAULT_TERM) return false;    
             }
-            
+
+            if (home.Rented == 1) // home is rented. Get rid of the renter.
+            {
+                home.Rented = 0;
+                home.renter.Renting = 0;
+                home.renter.HomeId = 0;
+                var renter = home.renter;
+                home.renter = null;
+                SavePlayerAndHome(home);
+                context.Renters.Update(renter);
+            }
+
             if (Address == home.Address)
             {
                 // player lives in house, they sell the home they move into an apartment
                 MoveIntoApartment();
             }
+
             Money = Money + home.Value;
+
             if (home.loan != null)
             {
                 Money = Money - home.loan.Principal;
-                context.Loans.Remove(home.loan);
+                var loan = home.loan;
+                home.loan = null;
+                SavePlayerAndHome(home);
+                context.Loans.Remove(loan);
             }
+
             home.Owned = 0;
-            home.ForSale = 1;
-            if (home.Rented == 1) // home is rented. Get rid of the renter.
-            {
-                home.Rented = 0;
-                var renter = context.Renters.FirstOrDefault(m => m.HomeId == home.HomeId);
-                renter.Renting = 0;
-                renter.HomeId = 0;
-                context.Update(renter);
-            }
+            home.ForSale = 0;
             home.Asking = home.Value + home.Value/10;
             UseAction();
             // TODO make this more realistic
@@ -351,7 +364,7 @@ namespace RealEstateGame.Models
         {
             if (HaveContext())
             {
-                context.Update(home);
+                context.Homes.Update(home);
                 Save();
             }
         }
@@ -360,7 +373,7 @@ namespace RealEstateGame.Models
         {
             if (HaveContext())
             {
-                context.Update(this);
+                context.Players.Update(this);
                 context.SaveChanges();
             }
         }
