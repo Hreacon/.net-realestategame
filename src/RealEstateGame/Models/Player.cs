@@ -214,8 +214,7 @@ namespace RealEstateGame.Models
                         context.Homes.Add(Home.GenerateRandomHome(PlayerId, rand));
                         Save();
                     }
-
-
+                    
                     // every six months, chance of home loosing condition point!
                     int chance = 30;
                     foreach (var home in GetOwnedHomes())
