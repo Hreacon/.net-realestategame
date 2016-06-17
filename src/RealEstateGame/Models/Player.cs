@@ -35,6 +35,12 @@ namespace RealEstateGame.Models
         public int Actions { get; set; }
         // current money on hand
         public double Money { get; set; }
+        // Current total of Rental Income
+        public double RentalIncome { get; set; }
+        // Current total of loan payments
+        public double LoanPayments { get; set; }
+        // Used to reduce useless database calls to save
+        public static bool DataChanged = false;
 
         // DbContext for updating homes when keeping track of turns
         [NotMapped] public ApplicationDbContext context;
@@ -48,39 +54,29 @@ namespace RealEstateGame.Models
             Jobs.Add("Part-Time");
             Jobs.Add("Self Employed");
         }
-
-        [NotMapped]
-        public double RentalIncome
+        
+        public void CalculateRentalIncome()
         {
-            get
+            RentalIncome = 0;
+            var renters = context.Renters.Where(m => m.PlayerId == PlayerId && m.Renting == 1).ToList();
+            if (renters.Any())
             {
-                double rentalIncome = 0;
-                var renters = context.Renters.Where(m => m.PlayerId == PlayerId && m.Renting == 1).ToList();
-                if (renters.Any())
+                foreach (var renter in renters)
                 {
-                    foreach (var renter in renters)
-                    {
-                        rentalIncome += renter.Rent;
-                    }
+                    RentalIncome += renter.Rent;
                 }
-                return rentalIncome;
             }
         }
-
-        [NotMapped]
-        public double LoanPayments
+    
+        public void CalculateLoanPayments()
         {
-            get
-            {
-                double loanPayments = 0;
-                var loans = GetLoans();
-                if(loans == null) return loanPayments;
+            LoanPayments = 0;
+            var loans = GetLoans();
+            if(loans != null) 
                 foreach (var loan in loans)
                 {
-                    loanPayments += loan.Payment;
+                    LoanPayments += loan.Payment;
                 }
-                return loanPayments;
-            }
         }
 
         [NotMapped]
@@ -98,7 +94,7 @@ namespace RealEstateGame.Models
         public void WorkOvertime(Random rand)
         {
             double extraPercent = 1;
-            while (extraPercent > .2)
+            while (extraPercent > .2) // TODO performance issue
                 extraPercent = rand.NextDouble();
             
             Money = Money + Income*extraPercent;
@@ -113,6 +109,7 @@ namespace RealEstateGame.Models
                 UseAction();
                 Money = Money - home.GetCostImprovement();
                 home.Improve();
+                DataChanged = true;
                 SavePlayerAndHome(home);
                 return true;
             }
@@ -128,6 +125,7 @@ namespace RealEstateGame.Models
                 // User is out of actions, change turns
                 NextTurn();
             }
+            DataChanged = true;
             Save();
         }
 
@@ -195,7 +193,7 @@ namespace RealEstateGame.Models
                 }
 
                 // not owned homes change for sale status
-                foreach (var home in context.Homes.Where(m => m.PlayerId == PlayerId && m.Owned == 0))
+                foreach (var home in context.Homes.Where(m => m.PlayerId == PlayerId && m.Owned == 0)) // TODO could this be sped up with a for loop?
                 {
                     // home randomly changes for sale status
                     if (Randomly(25, rand))
@@ -212,7 +210,6 @@ namespace RealEstateGame.Models
                     if (HaveContext())
                     {
                         context.Homes.Add(Home.GenerateRandomHome(PlayerId, rand));
-                        Save();
                     }
                     
                     // every six months, chance of home loosing condition point!
@@ -231,6 +228,7 @@ namespace RealEstateGame.Models
                     // every 12 months, homes get re-evaluated
                     Revalue();
                 }
+                DataChanged = true;
                 Save();
             }
         }
@@ -305,7 +303,9 @@ namespace RealEstateGame.Models
                 UseAction();
                 home.Owned = 1;
                 home.ForSale = 0;
+                DataChanged = true;
                 AddTransaction(new Transaction(PlayerId, home.HomeId, TurnNum, home.Asking));
+
                 SavePlayerAndHome(home);
                 return true;
             }
@@ -328,8 +328,9 @@ namespace RealEstateGame.Models
                 home.renter.HomeId = 0;
                 var renter = home.renter;
                 home.renter = null;
-                SavePlayerAndHome(home);
                 context.Renters.Update(renter);
+                DataChanged = true;
+                SavePlayerAndHome(home);
             }
 
             if (Address == home.Address)
@@ -345,17 +346,19 @@ namespace RealEstateGame.Models
                 Money = Money - home.loan.Principal;
                 var loan = home.loan;
                 home.loan = null;
-                SavePlayerAndHome(home);
                 context.Loans.Remove(loan);
+                DataChanged = true;
+                SavePlayerAndHome(home);
             }
 
             home.Owned = 0;
             home.ForSale = 0;
             home.Asking = home.Value + home.Value/10;
+            AddTransaction(new Transaction(PlayerId, home.HomeId, TurnNum, home.Value));
+            context.Update(home);
+            DataChanged = true;
             UseAction();
             // TODO make this more realistic
-            AddTransaction(new Transaction(PlayerId, home.HomeId, TurnNum, home.Value));
-            SavePlayerAndHome(home);
             return true;
         }
 
@@ -368,18 +371,20 @@ namespace RealEstateGame.Models
             }
         }
         
-        public void Save()
+        public void Save() // TODO reduce calls to savechanges. Use a boolean when something changes and flip it on save. Less database action = more speed
         {
-            if (HaveContext())
+            if (HaveContext() && DataChanged)
             {
                 context.Players.Update(this);
                 context.SaveChanges();
+                DataChanged = false;
             }
         }
 
         public void SkipTurn()
         {
             Actions = 0;
+            DataChanged = true;
             NextTurn();
             Save();
         }
@@ -400,6 +405,7 @@ namespace RealEstateGame.Models
                     if (Actions > 5) Actions = 5;
                 }
                 else if (job == Jobs[2]) Income = 0;
+                DataChanged = true;
             }
             Save();
         }
@@ -450,6 +456,7 @@ namespace RealEstateGame.Models
             LivingIn = livingin;
             Address = address;
             Rent = rent;
+            DataChanged = true;
             Save();
             return true;
         }
@@ -493,6 +500,7 @@ namespace RealEstateGame.Models
             renter.HomeId = 0;
             home.Rented = 0;
             context.Renters.Update(renter);
+            DataChanged = true;
             SavePlayerAndHome(home);
         }
     }

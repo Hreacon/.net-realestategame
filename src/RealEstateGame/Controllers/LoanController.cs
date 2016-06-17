@@ -112,8 +112,10 @@ namespace RealEstateGame.Controllers
                     var loan = _context.Loans.Add(new Loan(player.PlayerId, home.Asking - home.GetDownPayment(), GetAPR(), 360,
                         player.TurnNum, home)).Entity;
                     home.loan = loan;
+                    Player.DataChanged = true;
+                    _context.Update(home);
                     player.UseAction();
-                    player.SavePlayerAndHome(home);
+                    player.Save();
                     return RedirectToAction("Index", "Home", new {ajax=ajax});
                 }
             }
@@ -155,8 +157,10 @@ namespace RealEstateGame.Controllers
                     var loan = _context.Loans.Add(new Loan(player.PlayerId, home.Asking - home.GetFHADownPayment(), Loan.FHAAPR, 360,
                         player.TurnNum, home, 1)).Entity;
                     home.loan = loan;
+                    Player.DataChanged = true;
+                    _context.Update(home);
                     player.UseAction();
-                    player.SavePlayerAndHome(home);
+                    player.Save();
                     return RedirectToAction("Index", "Home", new {ajax=ajax});
                 }
             }
@@ -189,6 +193,7 @@ namespace RealEstateGame.Controllers
                     player.Money = player.Money - extrapayment;
                 }
                 player.context = _context;
+                Player.DataChanged = true;
                 player.Save();
             }
             return RedirectToAction("Index", new {ajax=ajax});

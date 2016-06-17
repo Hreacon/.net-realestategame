@@ -41,7 +41,8 @@ function ajaxReturn(target, result, tag) {
     console.log("post success");
     if (result.trim().substr(0, 1) == "<") {
         $(target).html(result);
-        updatePlayer();
+        if(target!="#viewplayer")
+            updatePlayer();
         ajaxInit();
         if (tag.length > 1 && tag != "no") {
             console.log('scroll');
