@@ -1,6 +1,7 @@
 ﻿function ajax(href, target) {
     // scalable ajax function. Use html attributes to get the target. Turn everything into an ajax call with a class and a data-target.
     // Also "breakproof". Site works with refreshing and even if there's no javascript.
+    var date1 = new Date().getTime();
     console.log("ajax");
     window.history.pushState('RealEstateGame', 'RealEstateGame', href);
     var tag = '';
@@ -18,6 +19,8 @@
         type: 'GET',
         url: href,
         success: function (result) {
+            var date2 = new Date().getTime();
+            console.log((date2 - date1));
             ajaxReturn(target, result, tag);
         }
     });
@@ -40,14 +43,13 @@ function ajaxPost(form, target) {
 function ajaxReturn(target, result, tag) {
     console.log("post success");
     if (result.trim().substr(0, 1) == "<") {
-        $(target).html(result);
-        if(target!="#viewplayer")
+        updateTarget(target, result, true);
+        if(target !== "#viewplayer")
             updatePlayer();
-        ajaxInit();
         if (tag.length > 1 && tag != "no") {
             console.log('scroll');
             $(window).scrollTop($(tag).offset().top-100);
-        } else if(tag != "no") {
+        } else if(tag !== "no") {
             $(window).scrollTop(0);
         }
     } else message(result);
@@ -59,9 +61,22 @@ function updatePlayer() {
         url: '/Home/GetPlayer?ajax=true',
         success: function (result) {
             console.log("Update Player Success");
-            $("#viewplayer").html(result);
+            updateTarget("#viewplayer", result, false);
         }
     });
+}
+function updateTarget(target, html, initajax) {
+    $(target)
+        .fadeOut(100,
+        function() {
+            $(target).html(html);
+            $(target)
+                .fadeIn(150,
+                    function() {
+                        if(initajax)
+                            ajaxInit();
+                    });
+        });
 }
 function message(text) {
     console.log("message '" + text+"'");
@@ -102,7 +117,7 @@ function ajaxInit() {
         .each(function () {
             $(this).on('mousemove', function () {
                     var slider = Number($(this).val());
-                    console.log(slider, money, slidertotal);
+                    //console.log(slider, money, slidertotal);
                     var val = '$' + parseFloat(slider, 10).toFixed(2).replace(/(\d)(?=(\d{3})+\.)/g, "$1,");
                     var tget = "output" + $(this).attr('id');
                     $("#"+tget).html(val);
@@ -128,6 +143,9 @@ function setSliderTotal(except) {
                 total += Number($(this).val());
         });
     return total;
+}
+function log(message) {
+    console.log(message, new Date().getTime());
 }
 $(document)
     .ready(function () {

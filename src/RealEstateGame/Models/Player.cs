@@ -66,6 +66,7 @@ namespace RealEstateGame.Models
                     RentalIncome += renter.Rent;
                 }
             }
+            context.Update(this);
         }
     
         public void CalculateLoanPayments()
@@ -77,12 +78,18 @@ namespace RealEstateGame.Models
                 {
                     LoanPayments += loan.Payment;
                 }
+            context.Update(this);
         }
 
         [NotMapped]
         public double NetPerTurn
         {
-            get { return Income - Rent + RentalIncome - LoanPayments; }
+            get
+            {
+                CalculateLoanPayments();
+                CalculateRentalIncome();
+                return Income - Rent + RentalIncome - LoanPayments;
+            }
         }
 
         public bool IsSelfEmployed()
@@ -94,8 +101,8 @@ namespace RealEstateGame.Models
         public void WorkOvertime(Random rand)
         {
             double extraPercent = 1;
-            while (extraPercent > .2) // TODO performance issue
-                extraPercent = rand.NextDouble();
+            extraPercent = rand.NextDouble();
+            if (extraPercent > .5) extraPercent = extraPercent/2;
             
             Money = Money + Income*extraPercent;
             UseAction();
@@ -109,8 +116,7 @@ namespace RealEstateGame.Models
                 UseAction();
                 Money = Money - home.GetCostImprovement();
                 home.Improve();
-                DataChanged = true;
-                SavePlayerAndHome(home);
+                context.Update(home);
                 return true;
             }
             return false;
@@ -125,8 +131,7 @@ namespace RealEstateGame.Models
                 // User is out of actions, change turns
                 NextTurn();
             }
-            DataChanged = true;
-            Save();
+            context.Update(this);
         }
 
         // Player advances to the next turn
@@ -144,6 +149,8 @@ namespace RealEstateGame.Models
                 else if (Job == Jobs[2]) Actions = 8;
                 
                 // add income
+                CalculateRentalIncome();
+                CalculateLoanPayments();
                 Money = Money + Income - Rent + RentalIncome;
                 
                 var homes = GetOwnedHomes();
@@ -160,8 +167,11 @@ namespace RealEstateGame.Models
                                 // pay only whats left on the mortgage, not the full thing
                                 Money = Money - home.loan.Principal;
                                 home.loan.MakePayment();
-                                context.Loans.Remove(home.loan);
+                                var loan = home.loan;
                                 home.loan = null;
+                                context.Update(home);
+                                context.SaveChanges();
+                                context.Loans.Remove(loan);
                             }
                             else
                             {
@@ -193,12 +203,13 @@ namespace RealEstateGame.Models
                 }
 
                 // not owned homes change for sale status
-                foreach (var home in context.Homes.Where(m => m.PlayerId == PlayerId && m.Owned == 0)) // TODO could this be sped up with a for loop?
+                foreach (var home in context.Homes.Where(m => m.PlayerId == PlayerId && m.Owned == 0)) // TODO could this be sped up with a for loop? 747ms
                 {
                     // home randomly changes for sale status
                     if (Randomly(25, rand))
                     {
                         home.ForSale = home.ForSale == 1 ? 0 : 1;
+                        context.Update(home);
                     }
                 }
 
@@ -207,10 +218,7 @@ namespace RealEstateGame.Models
                 if (TurnNum%6 == 0)
                 {
                     // every six months, a new home appears!
-                    if (HaveContext())
-                    {
-                        context.Homes.Add(Home.GenerateRandomHome(PlayerId, rand));
-                    }
+                    context.Homes.Add(Home.GenerateRandomHome(PlayerId, rand));
                     
                     // every six months, chance of home loosing condition point!
                     int chance = 30;
@@ -228,8 +236,6 @@ namespace RealEstateGame.Models
                     // every 12 months, homes get re-evaluated
                     Revalue();
                 }
-                DataChanged = true;
-                Save();
             }
         }
 
@@ -254,7 +260,6 @@ namespace RealEstateGame.Models
                 home.Revalue(city, country, rand);
                 context.Homes.Update(home);
             }
-            context.SaveChanges();
         }
 
         public int GetHomeForSaleCount()
@@ -305,8 +310,9 @@ namespace RealEstateGame.Models
                 home.ForSale = 0;
                 DataChanged = true;
                 AddTransaction(new Transaction(PlayerId, home.HomeId, TurnNum, home.Asking));
-
-                SavePlayerAndHome(home);
+                context.Update(home);
+                CalculateLoanPayments();
+                context.Update(this);
                 return true;
             }
             return false;
@@ -329,8 +335,9 @@ namespace RealEstateGame.Models
                 var renter = home.renter;
                 home.renter = null;
                 context.Renters.Update(renter);
-                DataChanged = true;
-                SavePlayerAndHome(home);
+                context.Update(home);
+                CalculateRentalIncome();
+                context.Update(this);
             }
 
             if (Address == home.Address)
@@ -346,9 +353,9 @@ namespace RealEstateGame.Models
                 Money = Money - home.loan.Principal;
                 var loan = home.loan;
                 home.loan = null;
+                context.Update(home);
+                context.SaveChanges();
                 context.Loans.Remove(loan);
-                DataChanged = true;
-                SavePlayerAndHome(home);
             }
 
             home.Owned = 0;
@@ -356,58 +363,33 @@ namespace RealEstateGame.Models
             home.Asking = home.Value + home.Value/10;
             AddTransaction(new Transaction(PlayerId, home.HomeId, TurnNum, home.Value));
             context.Update(home);
-            DataChanged = true;
             UseAction();
             // TODO make this more realistic
             return true;
         }
 
-        public void SavePlayerAndHome(Home home)
-        {
-            if (HaveContext())
-            {
-                context.Homes.Update(home);
-                Save();
-            }
-        }
-        
-        public void Save() // TODO reduce calls to savechanges. Use a boolean when something changes and flip it on save. Less database action = more speed
-        {
-            if (HaveContext() && DataChanged)
-            {
-                context.Players.Update(this);
-                context.SaveChanges();
-                DataChanged = false;
-            }
-        }
-
         public void SkipTurn()
         {
             Actions = 0;
-            DataChanged = true;
             NextTurn();
-            Save();
         }
 
         public void SetJob(string job)
         {
-            if (Jobs.Contains(job))
+            if (!Jobs.Contains(job)) return;
+            Job = job;
+            if (job == Jobs[0])
             {
-                Job = job;
-                if (job == Jobs[0])
-                {
-                    Income = 1300;
-                    if (Actions > 2) Actions = 2;
-                }
-                else if (job == Jobs[1])
-                {
-                    Income = 700;
-                    if (Actions > 5) Actions = 5;
-                }
-                else if (job == Jobs[2]) Income = 0;
-                DataChanged = true;
+                Income = 1300;
+                if (Actions > 2) Actions = 2;
             }
-            Save();
+            else if (job == Jobs[1])
+            {
+                Income = 700;
+                if (Actions > 5) Actions = 5;
+            }
+            else if (job == Jobs[2]) Income = 0;
+            context.Update(this);
         }
 
         public List<string> GetPotentialJobs()
@@ -445,43 +427,32 @@ namespace RealEstateGame.Models
             var loans = GetLoans();
             if (loans != null)
             {
-                foreach (var loan in loans)
+                if (loans.Where(loan => loan.LoanType == 1).Any(loan => TurnNum - loan.StartTurnNum < 12))
                 {
-                    if (loan.LoanType == 1)
-                    {
-                        if (TurnNum - loan.StartTurnNum < 12) return false;
-                    }
+                    return false;
                 }
             }
             LivingIn = livingin;
             Address = address;
             Rent = rent;
-            DataChanged = true;
-            Save();
+            context.Update(this);
             return true;
         }
 
         public IEnumerable<Home> GetOwnedHomes()
         {
-            if (HaveContext())
-            {
-                return context.Homes.Where(m => m.PlayerId == PlayerId && m.Owned == 1).Include(m=>m.renter).Include(m=>m.loan).ToList();
-            }
-            return null;
+            return context.Homes.Where(m => m.PlayerId == PlayerId && m.Owned == 1).Include(m=>m.renter).Include(m=>m.loan).ToList();
         }
 
         public Home GetHome(int id)
         {
-            if (HaveContext())
-            {
-                return context.Homes.Include(m=>m.loan).Include(m=>m.renter).FirstOrDefault(m => m.HomeId == id);
-            }
-            return null;
+            return context.Homes.Include(m=>m.loan).Include(m=>m.renter).FirstOrDefault(m => m.HomeId == id);
         }
 
+        // TODO Remove entirely
         public bool HaveContext()
         {
-            return context != null;
+            return true;
         }
 
         public IEnumerable<Loan> GetLoans()
@@ -500,8 +471,7 @@ namespace RealEstateGame.Models
             renter.HomeId = 0;
             home.Rented = 0;
             context.Renters.Update(renter);
-            DataChanged = true;
-            SavePlayerAndHome(home);
+            context.Update(home);
         }
     }
 }

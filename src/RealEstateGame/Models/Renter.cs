@@ -38,9 +38,11 @@ namespace RealEstateGame.Models
         private static Renter GenerateRenter(int playerId, Random rand = null)
         {
             if(rand == null) rand = new Random();
-            return new Renter()
+            var budget = rand.Next(1000, 6000);
+            if (rand.Next(0, 100) == 50) budget = budget*2;
+                return new Renter()
             {
-                Budget = rand.Next(500,3000),
+                Budget = budget,
                 Damage = rand.Next(0,10),
                 HomeId = 0,
                 Name = GenerateName(rand),

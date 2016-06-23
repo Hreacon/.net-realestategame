@@ -119,7 +119,6 @@ namespace RealEstateGame.Controllers
                     // there are no users. There are no user roles.
                     _context.Roles.Add(new IdentityRole("Admin"));
                     _context.Roles.Add(new IdentityRole("Player"));
-                    _context.SaveChanges();
                     var admin = new ApplicationUser()
                     {
                         UserName = "Admin",

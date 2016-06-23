@@ -115,7 +115,8 @@ namespace RealEstateGame.Controllers
                     Player.DataChanged = true;
                     _context.Update(home);
                     player.UseAction();
-                    player.Save();
+                    _context.Update(player);
+                    _context.SaveChanges();
                     return RedirectToAction("Index", "Home", new {ajax=ajax});
                 }
             }
@@ -160,7 +161,8 @@ namespace RealEstateGame.Controllers
                     Player.DataChanged = true;
                     _context.Update(home);
                     player.UseAction();
-                    player.Save();
+                    _context.Update(player);
+                    _context.SaveChanges();
                     return RedirectToAction("Index", "Home", new {ajax=ajax});
                 }
             }
@@ -188,13 +190,14 @@ namespace RealEstateGame.Controllers
                         var home = _context.Homes.FirstOrDefault(m => m.HomeId == loan.HomeId);
                         home.loan = null;
                         _context.Homes.Update(home);
+                        _context.SaveChanges();
                         _context.Loans.Remove(loan);
                     } else _context.Loans.Update(loan);
                     player.Money = player.Money - extrapayment;
                 }
                 player.context = _context;
-                Player.DataChanged = true;
-                player.Save();
+                _context.Update(player);
+                _context.SaveChanges();
             }
             return RedirectToAction("Index", new {ajax=ajax});
         }

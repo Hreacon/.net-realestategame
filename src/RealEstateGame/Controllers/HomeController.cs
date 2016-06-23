@@ -55,7 +55,7 @@ namespace RealEstateGame.Controllers
                 player = Player.GeneratePlayer(user);
                 _context.Players.Add(player);
                 _context.SaveChanges();
-                player = GetPlayer();
+                 player = GetPlayer();
                 _context.Homes.AddRange(Home.GenerateHomes(player.PlayerId));
                 _context.Renters.AddRange(Renter.GenerateRenters(player.PlayerId));
                 _context.SaveChanges();
@@ -133,23 +133,22 @@ namespace RealEstateGame.Controllers
         {
             var id = 0;
             Int32.TryParse(Request.Form["homeId"], out id);
-            if (id > 0)
+            if (id <= 0) return RedirectToAction("ViewMarket");
+            var ajax = Request.Form["ajax"].ToString();
+            var player = GetPlayer(); 
+            var success = player.BuyHome(id);
+            if (success)
             {
-                var ajax = Request.Form["ajax"].ToString();
-                var player = GetPlayer(); 
-                var success = player.BuyHome(id);
-                if (success)
+                _context.SaveChanges();
+                ViewBag.Homes = GetHomesForSale(player.PlayerId);
+                if (ajax == "true")
                 {
-                    ViewBag.Homes = GetHomesForSale(player.PlayerId);
-                    if (ajax == "true")
-                    {
-                        return PartialView("MarketPartial");
-                    }
+                    return PartialView("MarketPartial");
                 }
-                else
-                {
-                    return Content("You Can't Afford This Home");
-                }
+            }
+            else
+            {
+                return Content("You Can't Afford This Home");
             }
             return RedirectToAction("ViewMarket");
         }
@@ -157,7 +156,9 @@ namespace RealEstateGame.Controllers
         [Authorize(Roles = "Player")]
         public IActionResult SellHome(int id)
         {
-            GetPlayer().SellHome(id);
+            var player = GetPlayer();
+            player.SellHome(id);
+            _context.SaveChanges();
             return RedirectToAction("Index");
         }
 
@@ -182,17 +183,14 @@ namespace RealEstateGame.Controllers
             var ajax = Request.Form["ajax"].ToString();
             var id = Int32.Parse(Request.Form["homeId"].ToString());
             var success = player.ImproveHome(id);
-            if (success)
+            if (!success) return Content("You can't afford to improve this home...");
+            _context.SaveChanges();
+            ViewBag.Player = player;
+            if (ajax == "true")
             {
-
-                ViewBag.Player = player;
-                if (ajax == "true")
-                {
-                    return PartialView("PortfolioPartial");
-                }
-                return RedirectToAction("Portfolio");
+                return PartialView("PortfolioPartial");
             }
-            return Content("You can't afford to improve this home...");
+            return RedirectToAction("Portfolio");
         }
 
         [HttpPost]
@@ -213,6 +211,7 @@ namespace RealEstateGame.Controllers
                 if (!ViewBag.Player.MoveIntoApartment())
                     return Content(errorMessage);
             }
+            _context.SaveChanges();
             if (Request.Form["ajax"].ToString() == "true")
             {
                 return PartialView("PortfolioPartial");
@@ -227,6 +226,7 @@ namespace RealEstateGame.Controllers
             ViewBag.Player = GetPlayer();
             if (!ViewBag.Player.SellHome(Int32.Parse(Request.Form["homeId"])))
                 return Content("You can't sell this home right now");
+            _context.SaveChanges();
             if (Request.Form["ajax"].ToString() == "true")
             {
                 return PartialView("PortfolioPartial");
@@ -251,6 +251,7 @@ namespace RealEstateGame.Controllers
         { 
             ViewBag.Player = GetPlayer();
             ViewBag.Player.SetJob(Request.Form["newJob"]);
+            _context.SaveChanges();
             if (Request.Form["ajax"].ToString() == "true")
             {
                 return PartialView("MainControls");
@@ -267,11 +268,13 @@ namespace RealEstateGame.Controllers
             {
                 case "overtime":
                     player.WorkOvertime(_rand);
+                    _context.SaveChanges();
                     if(ajax == "true") return PartialView("DisplayTemplates/view-player");
                     break;
                 case "skipturn":
                     player.SkipTurn();
-                    if(ajax == "true") return PartialView("DisplayTemplates/view-player");
+                    _context.SaveChanges();
+                    if (ajax == "true") return PartialView("DisplayTemplates/view-player");
                     break;
                 default:
                     break;
@@ -334,7 +337,7 @@ namespace RealEstateGame.Controllers
             renter.Rent = home.GetRent();
             renter.HomeId = home.HomeId;
             renter.StartTurnNum = player.TurnNum;
-
+            player.CalculateRentalIncome();
             _context.Renters.Update(renter);
             _context.Homes.Update(home);
             _context.Players.Update(player);
@@ -375,6 +378,8 @@ namespace RealEstateGame.Controllers
             if (!(player.TurnNum > renter.StartTurnNum + Renter.Term)) return Content("Rental term isn't up yet");
 
             player.RemoveRenter(home);
+            player.CalculateRentalIncome();
+            _context.SaveChanges();
             return RedirectToAction("Portfolio", new {ajax = ajax});
         }
     }
