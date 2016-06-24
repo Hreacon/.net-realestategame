@@ -62,9 +62,6 @@ namespace RealEstateGame.Controllers
         public IActionResult Apply(string ajax)
         {
             var player = GetPlayer();
-            // Players income is listed income + rentals - expenses, namely mortgages. In the future mortgage payments also come out.
-            // TODO calculate total mortgage payments and deduct from income
-            // TODO calculate collected rent and add to income
             var income = player.NetPerTurn;
             // current interest rate.. held ??? currently static @ 4.5%
             var currentAPR = GetAPR();
@@ -117,6 +114,9 @@ namespace RealEstateGame.Controllers
                     player.UseAction();
                     _context.Update(player);
                     _context.SaveChanges();
+                    player.CalculateLoanPayments();
+                    _context.Update(player);
+                    _context.SaveChanges();
                     return RedirectToAction("Index", "Home", new {ajax=ajax});
                 }
             }
@@ -161,6 +161,9 @@ namespace RealEstateGame.Controllers
                     Player.DataChanged = true;
                     _context.Update(home);
                     player.UseAction();
+                    _context.Update(player);
+                    _context.SaveChanges();
+                    player.CalculateLoanPayments();
                     _context.Update(player);
                     _context.SaveChanges();
                     return RedirectToAction("Index", "Home", new {ajax=ajax});

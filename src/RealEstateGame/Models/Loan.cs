@@ -93,7 +93,7 @@ namespace RealEstateGame.Models
 
         public static double CalculateAffordableAmount(double payment, double apr, int term)
         {
-            return payment*(Math.Pow(1 + apr/12, term) - 1)/(apr/12*Math.Pow(1 + apr/12, term));
+            return payment*(Math.Pow(1 + apr/12, term) - 1)/(apr/12*Math.Pow(1 + apr/12, term))*2;
         }
     }
 }

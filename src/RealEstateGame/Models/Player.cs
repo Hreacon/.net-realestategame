@@ -253,18 +253,21 @@ namespace RealEstateGame.Models
             double sub = .2;
             var country = GeneratePercent(sub, high, rand);
             var city = GeneratePercent(sub, high, rand);
-            var homes = context.Homes;
+            var homes = context.Homes.Where(m=>m.PlayerId == PlayerId).ToList();
             // TODO Add neighborhood 2% as well, but for now just the city/country and home
             foreach (var home in homes)
             {
-                home.Revalue(city, country, rand);
-                context.Homes.Update(home);
+                if (Randomly(3, rand))
+                {
+                    home.Revalue(city, country, rand);
+                    context.Homes.Update(home);
+                }
             }
         }
 
         public int GetHomeForSaleCount()
         {
-            return context.Homes.Where(m => m.PlayerId == PlayerId && m.ForSale == 1).ToList().Count;
+            return context.Homes.Count(m => m.PlayerId == PlayerId && m.ForSale == 1);
         }
 
         public double GeneratePercent(double sub, double high, Random rand)
@@ -302,20 +305,17 @@ namespace RealEstateGame.Models
         public bool BuyHome(int id)
         {
             var home = GetHome(id);
-            if (home.Asking < Money)
-            {
-                Money = Money - home.Asking;
-                UseAction();
-                home.Owned = 1;
-                home.ForSale = 0;
-                DataChanged = true;
-                AddTransaction(new Transaction(PlayerId, home.HomeId, TurnNum, home.Asking));
-                context.Update(home);
-                CalculateLoanPayments();
-                context.Update(this);
-                return true;
-            }
-            return false;
+            if (!(home.Asking < Money)) return false;
+            Money = Money - home.Asking;
+            UseAction();
+            home.Owned = 1;
+            home.ForSale = 0;
+            DataChanged = true;
+            AddTransaction(new Transaction(PlayerId, home.HomeId, TurnNum, home.Asking));
+            context.Update(home);
+            CalculateLoanPayments();
+            context.Update(this);
+            return true;
         }
 
         public bool SellHome(int id)

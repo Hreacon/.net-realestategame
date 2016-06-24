@@ -337,12 +337,13 @@ namespace RealEstateGame.Controllers
             renter.Rent = home.GetRent();
             renter.HomeId = home.HomeId;
             renter.StartTurnNum = player.TurnNum;
-            player.CalculateRentalIncome();
             _context.Renters.Update(renter);
             _context.Homes.Update(home);
             _context.Players.Update(player);
             _context.SaveChanges();
-            
+            player.CalculateRentalIncome();
+            _context.Players.Update(player);
+            _context.SaveChanges();
             return RedirectToAction("Portfolio", new {ajax = ajax});
         }
         
